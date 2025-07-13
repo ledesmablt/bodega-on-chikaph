@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import { marked } from 'marked'
   import * as d3 from 'd3'
 
   // TODO: load this async
@@ -19,7 +20,7 @@
   const minUps = d3.min(chikaPosts, (d) => d.ups) ?? 0
 
   type ChikaPost = (typeof chikaPosts)[0]
-  let activePost: ChikaPost | null = $state(null)
+  let selectedPost: ChikaPost | null = $state(null)
 
   const drawContainer = () => {
     const containerWidth = cellSize * cols + labelWidth + labelPadding
@@ -68,7 +69,7 @@
       .join('rect')
       .classed('top-10-item', true)
       .on('click', (_event, d) => {
-        activePost = d
+        onOpenDialog(d)
       })
       .attr('rx', 4)
       .attr('width', cellSize - padding * 2)
@@ -82,6 +83,23 @@
       .attr('opacity', 1)
   }
 
+  const getModal = () => {
+    return document.getElementById('post-dialog') as HTMLDialogElement
+  }
+
+  const onOpenDialog = (post: ChikaPost) => {
+    selectedPost = post
+    const dialog = getModal()
+    dialog.showModal()
+
+  }
+  const onCloseDialog = () => {
+    selectedPost = null
+    const dialog = getModal()
+    dialog.close()
+
+  }
+
   onMount(() => {
     drawContainer()
     drawLabels()
@@ -93,28 +111,60 @@
   <h2 class="mb-4 text-2xl font-bold">Top 10 Chika Posts per month</h2>
   <svg id="top-10-wrapper"> </svg>
 
-  {#if activePost}
-    <div class="mt-4 max-w-120 rounded bg-white p-4 shadow">
-      <h3 class="text-lg font-semibold">{activePost.title}</h3>
-      <p class="text-sm text-gray-600">
-        Posted on: {new Date(activePost.date).toLocaleDateString()}
-      </p>
-      <p class="text-sm">Ups: {activePost.ups}</p>
-      <p class="text-sm">Comments: {activePost.num_comments}</p>
-      <a
-        href={activePost.permalink}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-blue-500 hover:underline"
-      >
-        View Post
-      </a>
-      <p class="max-w-100">{activePost.selftext}</p>
-    </div>
-  {/if}
+  <dialog id='post-dialog' closedby='any'>
+    {#if selectedPost}
+      <div class='w-full flex'>
+        <button class='cursor-pointer ml-auto' onclick={onCloseDialog}>x</button>
+      </div>
+      <h3 class="text-2xl font-semibold">{selectedPost.title}</h3>
+      <div class='font-mono'>
+        <p class="text-sm text-gray-600">
+          Posted on: {new Date(selectedPost.date).toLocaleDateString()}
+        </p>
+        <p class="text-sm">{selectedPost.ups.toLocaleString()} upvotes</p>
+      </div>
+
+      {#if selectedPost.selftext}
+        <div id='post-selftext' class='flex flex-col gap-2 py-4 text-sm'>
+          {@html marked(selectedPost.selftext)}
+        </div>
+      {/if}
+      <div class='flex justify-center mb-4'>
+        <a
+          href={selectedPost.permalink}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-blue-500 hover:underline"
+        >
+          View post on Reddit
+        </a>
+      </div>
+    {/if}
+  </dialog>
 </div>
 
 <style>
+  dialog {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 480px;
+    padding: 16px 24px;
+    border-radius: 6px;
+
+    :global {
+      div#post-selftext {
+        a {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
   :global {
     svg#top-10-wrapper {
       .top-10-item {
