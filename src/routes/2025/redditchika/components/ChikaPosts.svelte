@@ -9,6 +9,21 @@
   const containerWidth = 600
   const containerHeight = 600
 
+  const REACTIONS: Record<string, string> = {
+    respect: 'positive',
+    happy: 'positive',
+    funny: 'positive',
+    supportive: 'positive',
+    dasurb: 'neutral',
+    shocking: 'neutral',
+    interesting: 'neutral',
+    neutral: 'neutral',
+    mixed: 'neutral',
+    sad: 'negative',
+    annoying: 'negative',
+    angry: 'negative',
+  }
+
   const chikaPosts = rawData.filter(
     (d) => new Date(d.date).getFullYear() >= 2024 && new Date(d.date) < new Date('2025-07-01')
   )
@@ -17,8 +32,10 @@
 
   type ChikaPost = (typeof chikaPosts)[0]
   type SimulationNode = ChikaPost & d3.SimulationNodeDatum
+  type ColorMode = 'ups' | 'sentiment'
   let selectedPost: ChikaPost | null = $state(null)
   let simulation: d3.Simulation<any, any> | null = $state(null)
+  let colorMode = $state<ColorMode>('ups')
 
   const drawContainer = () => {
     const container = d3
@@ -36,7 +53,33 @@
     const nodes = chikaPosts as SimulationNode[]
     const g = d3.select('g#top-10-group')
     const orangeGradient = d3.interpolateRgb('#fcdacc', '#ff4500')
+
+    const greenGradient = d3.interpolateRgb('#bbf7d0', '#15803d')
+    const neutralGradient = d3.interpolateRgb('#e5e7eb', '#111827')
+    const redGradient = d3.interpolateRgb('#fecaca', '#dc2626')
     const upsScale = d3.scaleLinear([minUps, maxUps], [4, 40])
+
+    const getFill = (d: ChikaPost): string => {
+      const defaultColor = 'black'
+      const ratio = (d.ups - minUps) / (maxUps - minUps)
+
+      if (colorMode === 'ups') {
+        return orangeGradient(ratio)
+      } else if (colorMode === 'sentiment') {
+        switch (REACTIONS[d.reaction ?? '']) {
+          case 'positive':
+            return greenGradient(ratio)
+          case 'neutral':
+            return neutralGradient(ratio)
+          case 'negative':
+            return redGradient(ratio)
+          default:
+            return defaultColor
+        }
+      }
+
+      return defaultColor
+    }
 
     const ticked = () => {
       g.selectAll('circle.top-10-item')
@@ -46,10 +89,7 @@
         .on('click', (_event, d) => {
           onOpenDialog(d)
         })
-        .attr('fill', (d) => {
-          const ratio = (d.ups - minUps) / (maxUps - minUps)
-          return orangeGradient(ratio)
-        })
+        .attr('fill', (d) => getFill(d))
         .attr('r', (d) => upsScale(d.ups))
         .attr('cx', (d) => d.x ?? 0)
         .attr('cy', (d) => d.y ?? 0)
@@ -82,6 +122,14 @@
     dialog.close()
   }
 
+  const toggleColorMode = () => {
+    if (colorMode === 'ups') {
+      colorMode = 'sentiment'
+    } else {
+      colorMode = 'ups'
+    }
+  }
+
   onMount(() => {
     drawContainer()
     drawSimulation()
@@ -90,6 +138,7 @@
 
 <div class="flex min-h-200 w-full flex-col items-center justify-center">
   <h2 class="mb-4 text-2xl font-bold">Top 10 Chika Posts per month</h2>
+  <button class='border border-gray rounded cursor-pointer p-2' onclick={toggleColorMode}>color by {colorMode === 'ups' ? 'ups' : 'sentiment'}</button>
   <svg id="top-10-wrapper"> </svg>
 
   <dialog id="post-dialog" closedby="any">
@@ -152,7 +201,9 @@
         transition: fill 0.2s ease;
         cursor: pointer;
         &:hover {
-          fill: #ff4500;
+          /* fill: #ff4500; */
+          stroke: #000;
+          stroke-width: 2px;
         }
       }
 
