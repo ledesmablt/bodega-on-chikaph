@@ -4,7 +4,7 @@
   import * as d3 from 'd3'
 
   // TODO: load this async
-  import rawData from '../data/chika_10.json'
+  import chikaPosts from '../data/chika_10.json'
 
   const containerWidth = 600
   const containerHeight = 600
@@ -24,9 +24,6 @@
     angry: 'negative'
   }
 
-  const chikaPosts = rawData.filter(
-    (d) => new Date(d.date).getFullYear() >= 2024 && new Date(d.date) < new Date('2025-07-01')
-  )
   const maxUps = d3.max(chikaPosts, (d) => d.ups) ?? 10000
   const minUps = d3.min(chikaPosts, (d) => d.ups) ?? 0
 
@@ -35,6 +32,7 @@
   type ColorMode = 'ups' | 'sentiment'
   let selectedPost: ChikaPost | null = $state(null)
   let simulation: d3.Simulation<any, any> | null = $state(null)
+  let showOnlyTop10 = $state(true)
   let colorMode = $state<ColorMode>('ups')
 
   const drawContainer = () => {
@@ -49,8 +47,17 @@
       .attr('id', 'top-10-group')
   }
 
-  const drawSimulation = () => {
-    const nodes = chikaPosts as SimulationNode[]
+  interface DrawSimulationOptions {
+    resetForce?: boolean
+  }
+  const drawSimulation = (options: DrawSimulationOptions = {}) => {
+    let nodes = chikaPosts as SimulationNode[]
+    if (showOnlyTop10) {
+      // TODO: fix wonky force behavior. d3 selection#filter doesnt seem to be working.
+      // but for some reason when svelte re-mounts after a file change, it behaves completely fine.
+      nodes = chikaPosts.filter((post) => post.overall_rank <= 10)
+    }
+
     const g = d3.select('g#top-10-group')
     const orangeGradient = d3.interpolateRgb('#fcdacc', '#ff4500')
 
@@ -81,7 +88,7 @@
       return defaultColor
     }
 
-    const ticked = () => {
+    const onSimulationTick = () => {
       g.selectAll('circle.top-10-item')
         .data(nodes, (d) => (d as ChikaPost).id)
         .join('circle')
@@ -97,14 +104,15 @@
     }
 
     const alreadySimulated = !!simulation
-    simulation = d3.forceSimulation(nodes).on('tick', ticked)
+    simulation = d3.forceSimulation(nodes).on('tick', onSimulationTick)
 
-    if (!alreadySimulated) {
+    if (options.resetForce || !alreadySimulated) {
       // init the actual physics. this shouldn't be declared twice otherwise
       // even just a color update will physically move the simulation
+      const forceStrength = showOnlyTop10 ? 50 : 1
       simulation
         .force('center', d3.forceCenter(containerWidth / 2, containerHeight / 2))
-        .force('charge', d3.forceManyBody().strength(1))
+        .force('charge', d3.forceManyBody().strength(forceStrength))
         .force(
           'collision',
           d3.forceCollide().radius((d) => upsScale((d as SimulationNode).ups) + 1)
@@ -136,6 +144,11 @@
     drawSimulation()
   }
 
+  const toggleShowAllPosts = () => {
+    showOnlyTop10 = !showOnlyTop10
+    drawSimulation({ resetForce: true })
+  }
+
   onMount(() => {
     drawContainer()
     drawSimulation()
@@ -144,9 +157,18 @@
 
 <div class="flex min-h-200 w-full flex-col items-center justify-center">
   <h2 class="mb-4 text-2xl font-bold">Top 10 Chika Posts per month</h2>
-  <button class="border-gray cursor-pointer rounded border p-2" onclick={toggleColorMode}
-    >color by {colorMode === 'ups' ? 'ups' : 'sentiment'}</button
-  >
+  <div id="controls">
+    <button class="border-gray cursor-pointer rounded border p-2" onclick={toggleShowAllPosts}>
+      {#if showOnlyTop10}
+        show all posts
+      {:else}
+        show top 10 posts
+      {/if}
+    </button>
+    <button class="border-gray cursor-pointer rounded border p-2" onclick={toggleColorMode}>
+      color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
+    </button>
+  </div>
   <svg id="top-10-wrapper"> </svg>
 
   <dialog id="post-dialog" closedby="any">
