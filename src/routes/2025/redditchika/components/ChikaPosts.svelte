@@ -21,7 +21,7 @@
     mixed: 'neutral',
     sad: 'negative',
     annoying: 'negative',
-    angry: 'negative',
+    angry: 'negative'
   }
 
   const chikaPosts = rawData.filter(
@@ -96,15 +96,20 @@
         .attr('opacity', 1)
     }
 
-    simulation = d3
-      .forceSimulation(nodes)
-      .force('center', d3.forceCenter(containerWidth / 2, containerHeight / 2))
-      .force('charge', d3.forceManyBody().strength(1))
-      .force(
-        'collision',
-        d3.forceCollide().radius((d) => upsScale((d as SimulationNode).ups) + 1)
-      )
-      .on('tick', ticked)
+    const alreadySimulated = !!simulation
+    simulation = d3.forceSimulation(nodes).on('tick', ticked)
+
+    if (!alreadySimulated) {
+      // init the actual physics. this shouldn't be declared twice otherwise
+      // even just a color update will physically move the simulation
+      simulation
+        .force('center', d3.forceCenter(containerWidth / 2, containerHeight / 2))
+        .force('charge', d3.forceManyBody().strength(1))
+        .force(
+          'collision',
+          d3.forceCollide().radius((d) => upsScale((d as SimulationNode).ups) + 1)
+        )
+    }
   }
 
   const getModal = () => {
@@ -128,6 +133,7 @@
     } else {
       colorMode = 'ups'
     }
+    drawSimulation()
   }
 
   onMount(() => {
@@ -138,7 +144,9 @@
 
 <div class="flex min-h-200 w-full flex-col items-center justify-center">
   <h2 class="mb-4 text-2xl font-bold">Top 10 Chika Posts per month</h2>
-  <button class='border border-gray rounded cursor-pointer p-2' onclick={toggleColorMode}>color by {colorMode === 'ups' ? 'ups' : 'sentiment'}</button>
+  <button class="border-gray cursor-pointer rounded border p-2" onclick={toggleColorMode}
+    >color by {colorMode === 'ups' ? 'ups' : 'sentiment'}</button
+  >
   <svg id="top-10-wrapper"> </svg>
 
   <dialog id="post-dialog" closedby="any">
