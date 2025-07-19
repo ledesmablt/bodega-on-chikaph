@@ -2,12 +2,24 @@
   import { onMount } from 'svelte'
   import { marked } from 'marked'
   import * as d3 from 'd3'
+  // import { viewport } from '$lib/viewport'
 
   // TODO: load this async
   import chikaPosts from '../data/chika_10.json'
 
-  const containerWidth = 390
-  const containerHeight = 390
+  // TODO: plug this into the tailwind theme
+  const MIN_VW = 390
+  const MAX_VW = 640
+  const vwDomain = [MIN_VW, MAX_VW]
+  // TODO: fix resizing
+  // const viewportScale = d3.scaleLinear(vwDomain, vwDomain).clamp(true)
+  // let containerWidth = viewportScale($viewport.width)
+  // console.debug('component', containerWidth)
+  let containerWidth = MAX_VW
+  let containerHeight = containerWidth
+  const minCircleR = d3.scaleLinear(vwDomain, [5,8]).clamp(true)(containerWidth)
+  const maxCircleR = d3.scaleLinear(vwDomain, [20,40]).clamp(true)(containerWidth)
+
 
   const REACTIONS: Record<string, string> = {
     respect: 'positive',
@@ -64,7 +76,7 @@
     const greenGradient = d3.interpolateRgb('#bbf7d0', '#15803d')
     const neutralGradient = d3.interpolateRgb('#e5e7eb', '#111827')
     const redGradient = d3.interpolateRgb('#fecaca', '#dc2626')
-    const upsScale = d3.scaleLinear([minUps, maxUps], [5, 20])
+    const upsScale = d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR])
 
     const getFill = (d: ChikaPost): string => {
       const defaultColor = 'black'

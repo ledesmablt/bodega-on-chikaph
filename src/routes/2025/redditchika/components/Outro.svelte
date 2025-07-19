@@ -4,7 +4,7 @@
 </script>
 
 <section id="outro" class="mb-20">
-  <div class="prose">
+  <div class="app-prose">
     {@html marked(outroText)}
   </div>
   <div class='mt-20 text-center'>

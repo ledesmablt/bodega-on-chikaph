@@ -3,9 +3,9 @@
   import introText from '../text/intro.md?raw'
 </script>
 
-<section id="intro" class="prose">
+<section id="intro" class="app-prose">
   <div id="title" class="mt-10">
-    <h1 class="m-auto text-center">ano chika?!</h1>
+    <h1 class="m-auto text-center font-bold text-3xl mb-4">ano chika?!</h1>
   </div>
 
   <div class="callout p-4 rounded border border-gray-300">

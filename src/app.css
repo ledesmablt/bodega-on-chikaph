@@ -1,2 +1,7 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+
+:root {
+  --app-min-vw: 390px;
+
+}
