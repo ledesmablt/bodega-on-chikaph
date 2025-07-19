@@ -1,19 +1,14 @@
 <script lang="ts">
   import Intro from './components/Intro.svelte'
-  import ChikaPosts from './components/ChikaPosts.svelte'
+  import PostStory from './components/PostStory.svelte'
   import Outro from './components/Outro.svelte'
-  import { viewport } from '$lib/viewport'
 </script>
 
 {#if typeof window !== 'undefined'}
   <article id="redditchika_2025">
-    <Intro/>
-    <section class="w-full flex flex-col items-center"> 
-      <div class='spacer' style:height={`${$viewport.height}px`}></div>
-      <ChikaPosts />
-      <div class='h-[2000px]'></div>
-    </section>
-    <Outro/>
+    <Intro />
+    <PostStory />
+    <Outro />
   </article>
 {/if}
 
@@ -29,6 +24,7 @@
         width: 100%;
         max-width: 640px;
         padding: 0 24px;
+        font-family: var(--font-serif);
 
         p {
           margin: 12px 0;

@@ -3,20 +3,18 @@
   import introText from '../text/intro.md?raw'
 </script>
 
-<section id="intro" class="app-prose">
-  <div id="title" class="mt-10">
-    <h1 class="m-auto text-center font-bold text-3xl mb-4">ano chika?!</h1>
-  </div>
+<div id="title" class="mt-10 mb-4 text-center font-serif">
+  <h1 class="m-auto mb-4 text-3xl font-bold">ano chika?!</h1>
+  <p class="italic">a glimpse into the Filipino pop culture psyche through r/ChikaPH</p>
+  <p class="italic">by Benj Ledesma</p>
+</div>
 
-  <div class="callout p-4 rounded border border-gray-300">
+<section id="intro" class="app-prose">
+  <div class="callout my-8 rounded border border-gray-300 p-4">
     <div>
-      <span class='text-xl'>
-        chi·ka
-      </span>
+      <span class="text-xl"> chi·ka </span>
     </div>
-    <div class='text-gray-500'>
-      gossip; rumors; chit-chat.
-    </div>
+    <div class="text-gray-500">gossip; rumors; chit-chat.</div>
   </div>
   {@html marked(introText)}
 </section>

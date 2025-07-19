@@ -2,8 +2,6 @@
   import { onMount } from 'svelte'
   import { marked } from 'marked'
   import * as d3 from 'd3'
-  // import { viewport } from '$lib/viewport'
-
   // TODO: load this async
   import chikaPosts from '../data/chika_10.json'
 
@@ -11,15 +9,12 @@
   const MIN_VW = 390
   const MAX_VW = 640
   const vwDomain = [MIN_VW, MAX_VW]
-  // TODO: fix resizing
-  // const viewportScale = d3.scaleLinear(vwDomain, vwDomain).clamp(true)
-  // let containerWidth = viewportScale($viewport.width)
-  // console.debug('component', containerWidth)
-  let containerWidth = MAX_VW
-  let containerHeight = containerWidth
-  const minCircleR = d3.scaleLinear(vwDomain, [5,8]).clamp(true)(containerWidth)
-  const maxCircleR = d3.scaleLinear(vwDomain, [20,40]).clamp(true)(containerWidth)
-
+  let containerWidth = $state(MAX_VW)
+  let containerHeight = $derived(containerWidth)
+  const minCircleScale = d3.scaleLinear(vwDomain, [5, 8]).clamp(true)
+  const maxCircleScale = d3.scaleLinear(vwDomain, [20, 40]).clamp(true)
+  const minCircleR = $derived(minCircleScale(containerWidth))
+  const maxCircleR = $derived(maxCircleScale(containerWidth))
 
   const REACTIONS: Record<string, string> = {
     respect: 'positive',
@@ -169,11 +164,22 @@
     // showOnlyTop10 = true
     // drawSimulation({ resetForce: true })
   })
+
+  $inspect('top10', showOnlyTop10)
+
+  $effect(() => {
+    drawContainer()
+    // drawSimulation()
+  })
 </script>
 
-<div class="sticky top-1/2 transform-[translateY(-50%)]">
+<div class="sticky top-1/2 w-full transform-[translateY(-50%)]" bind:clientWidth={containerWidth}>
   <div id="controls">
-    <button class="border-gray cursor-pointer rounded border p-2" onclick={toggleShowAllPosts}>
+    <button
+      id="toggle-top10"
+      class="border-gray cursor-pointer rounded border p-2"
+      onclick={toggleShowAllPosts}
+    >
       {#if showOnlyTop10}
         show all posts
       {:else}
@@ -184,7 +190,7 @@
       color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
     </button>
   </div>
-  <svg id="top-10-wrapper" class="border border-gray-500 mt-2 "> </svg>
+  <svg id="top-10-wrapper" class="mt-2 border border-gray-500"> </svg>
 
   <dialog id="post-dialog" closedby="any">
     {#if selectedPost}

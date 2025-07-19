@@ -7,8 +7,5 @@
   <div class="app-prose">
     {@html marked(outroText)}
   </div>
-  <div class='mt-20 text-center'>
-    TODO footer / nav
-  </div>
+  <div class="mt-20 text-center">TODO footer / nav</div>
 </section>
-
