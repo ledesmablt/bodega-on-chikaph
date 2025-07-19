@@ -6,8 +6,8 @@
   // TODO: load this async
   import chikaPosts from '../data/chika_10.json'
 
-  const containerWidth = 600
-  const containerHeight = 600
+  const containerWidth = 390
+  const containerHeight = 390
 
   const REACTIONS: Record<string, string> = {
     respect: 'positive',
@@ -64,7 +64,7 @@
     const greenGradient = d3.interpolateRgb('#bbf7d0', '#15803d')
     const neutralGradient = d3.interpolateRgb('#e5e7eb', '#111827')
     const redGradient = d3.interpolateRgb('#fecaca', '#dc2626')
-    const upsScale = d3.scaleLinear([minUps, maxUps], [4, 40])
+    const upsScale = d3.scaleLinear([minUps, maxUps], [5, 20])
 
     const getFill = (d: ChikaPost): string => {
       const defaultColor = 'black'
@@ -152,11 +152,14 @@
   onMount(() => {
     drawContainer()
     drawSimulation()
+
+    // NOTE: might have to render all nodes and then flip em off to fix that wonky force issue
+    // showOnlyTop10 = true
+    // drawSimulation({ resetForce: true })
   })
 </script>
 
-<div class="flex min-h-200 w-full flex-col items-center justify-center">
-  <h2 class="mb-4 text-2xl font-bold">Top 10 Chika Posts per month</h2>
+<div class="sticky top-1/2 transform-[translateY(-50%)]">
   <div id="controls">
     <button class="border-gray cursor-pointer rounded border p-2" onclick={toggleShowAllPosts}>
       {#if showOnlyTop10}
@@ -169,7 +172,7 @@
       color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
     </button>
   </div>
-  <svg id="top-10-wrapper"> </svg>
+  <svg id="top-10-wrapper" class="border border-gray-500 mt-2 "> </svg>
 
   <dialog id="post-dialog" closedby="any">
     {#if selectedPost}

@@ -7,7 +7,10 @@
 {#if typeof window !== 'undefined'}
   <article id="redditchika_2025">
     <Intro/>
-    <ChikaPosts />
+    <section class="w-full mt-100 flex flex-col items-center"> 
+      <ChikaPosts />
+      <div class='h-[2000px]'></div>
+    </section>
     <Outro/>
   </article>
 {/if}
@@ -20,7 +23,7 @@
 
       .prose {
         margin: 0 auto;
-        width: clamp(400px, 80%, 100%);
+        width: clamp(390px, 100%, 100%);
       }
     }
   }
