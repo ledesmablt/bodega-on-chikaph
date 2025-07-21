@@ -4,12 +4,16 @@
   import ChikaPosts from './ChikaPosts.svelte'
 
   let currentStep = $state(0)
+  let selectedPeople = $state<string[]>([])
+  let shouldResetForce = $state(true)
+  let showOnlyTop10 = $state(true)
 
   const setupScrolly = () => {
     const scroller = scrollama()
     scroller
       .setup({
-        step: 'section#posts-story .story-step'
+        step: 'section#posts-story [data-step]',
+        offset: 0.7
       })
       .onStepEnter(({ element }) => {
         currentStep = Number(element.attributes.getNamedItem('data-step')?.value || currentStep)
@@ -17,13 +21,19 @@
   }
 
   $effect(() => {
-    if (currentStep === 1) {
-      const elem: HTMLButtonElement | null = document.querySelector('#controls #toggle-top10')
-      elem?.click()
+    if (currentStep === 0) {
+      selectedPeople = []
+    } else if (currentStep === 1) {
+      selectedPeople = ['Christopher Diwata']
+    } else if (currentStep === 2) {
+      selectedPeople = ['Maris Racal', 'Anthony Jennings']
+      showOnlyTop10 = true
+    } else if (currentStep === 3) {
+      selectedPeople = []
+      showOnlyTop10 = false
+      shouldResetForce = true
     }
   })
-
-  $inspect(currentStep)
 
   onMount(() => {
     setupScrolly()
@@ -33,11 +43,13 @@
 <section id="posts-story" class="flex w-full max-w-screen flex-col items-center">
   <div class="h-[40vh]"></div>
 
-  <ChikaPosts />
+  <div data-step={0}></div>
+
+  <ChikaPosts bind:selectedPeople bind:shouldResetForce bind:showOnlyTop10 />
 
   <div class="spacer"></div>
 
-  <div class="story-step">
+  <div class="story-step" data-step={1}>
     <p>
       The most upvoted post of all-time on the subreddit has people celebrating the recent brand
       deals and successes of <strong>Christopher Diwata</strong>, AKA “what hafen vella?,” “Taylor
@@ -47,7 +59,7 @@
 
   <div class="spacer"></div>
 
-  <div class="story-step">
+  <div class="story-step" data-step={2}>
     <p>
       The <strong>Anthony & Maris</strong> issue last year also made huge waves—at the time it felt like
       everyone was glued to their screens waiting for the next update, spilling new info and tea over
@@ -58,7 +70,7 @@
 
   <div class="spacer"></div>
 
-  <div class="story-step" data-step={1}>
+  <div class="story-step" data-step={3}>
     <p>
       Is there more to ChikaPH than celebrities and politics? Does the sub tend to talk about
       certain people or topics over others?
