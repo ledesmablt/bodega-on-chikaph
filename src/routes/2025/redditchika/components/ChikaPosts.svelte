@@ -2,8 +2,6 @@
   import { onMount } from 'svelte'
   import { marked } from 'marked'
   import * as d3 from 'd3'
-  // TODO: load this async
-  import chikaPosts from '../data/chika_10.json'
   import _ from 'lodash'
 
   let {
@@ -11,6 +9,7 @@
     shouldResetForce = $bindable(true),
     showOnlyTop10 = $bindable(true)
   } = $props()
+
 
   // TODO: plug this into the tailwind theme
   const MIN_VW = 390
@@ -38,27 +37,17 @@
     angry: 'negative'
   }
 
-  const maxUps = d3.max(chikaPosts, (d) => d.ups) ?? 10000
-  const minUps = d3.min(chikaPosts, (d) => d.ups) ?? 0
+  type ChikaPost = any // TODO: fix
+	let chikaPosts = $state<ChikaPost[]>([])
 
-  type ChikaPost = (typeof chikaPosts)[0]
+  const maxUps = $derived(d3.max(chikaPosts, (d) => d.ups) ?? 10000)
+  const minUps = $derived(d3.min(chikaPosts, (d) => d.ups) ?? 0)
+
   type SimulationNode = ChikaPost & d3.SimulationNodeDatum
   type ColorMode = 'ups' | 'sentiment'
   let selectedPost: ChikaPost | null = $state(null)
   let simulation: d3.Simulation<any, any> | null = $state(null)
   let colorMode = $state<ColorMode>('ups')
-
-  const resetNodeForce = (node: SimulationNode) => {
-    return {
-      ...node,
-      x: undefined,
-      y: undefined,
-      fx: undefined,
-      fy: undefined,
-      vx: undefined,
-      vy: undefined,
-    }
-  }
 
   const drawContainer = () => {
     const container = d3
@@ -177,8 +166,12 @@
   }
 
   onMount(() => {
-    drawContainer()
-    drawSimulation()
+		d3.json('/data/2025/redditchika/chika_10.json')
+      .then((data) => {
+        chikaPosts = data as ChikaPost[]
+        drawContainer()
+        drawSimulation()
+      }).catch(console.error)
 
     // NOTE: might have to render all nodes and then flip em off to fix that wonky force issue
     // showOnlyTop10 = true
@@ -187,8 +180,13 @@
 
   // TODO: fix responsiveness
   $effect(() => {
-    drawContainer()
-    drawSimulation()
+    if (chikaPosts.length === 0) {
+      return
+    }
+    if (shouldResetForce) {
+      drawContainer()
+      drawSimulation()
+    }
   })
 </script>
 
@@ -209,7 +207,7 @@
       color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
     </button>
   </div>
-  <svg id="top-10-wrapper" class="mt-2 border border-gray-500"> </svg>
+  <svg id="top-10-wrapper" class="mt-2 border border-gray-500 z-1"> </svg>
 
   <dialog id="post-dialog" closedby="any">
     {#if selectedPost}
