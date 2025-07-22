@@ -23,6 +23,10 @@
       max-width: 640px;
       margin: 0 auto;
 
+      ::selection {
+        background: #fcdacc;
+      }
+
       .app-prose {
         margin: 0 auto;
         width: 100%;
