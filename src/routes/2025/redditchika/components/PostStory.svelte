@@ -3,10 +3,10 @@
   import scrollama from 'scrollama'
   import ChikaPosts from './ChikaPosts.svelte'
 
-  let currentStep = $state(0)
+  let currentStep = $state<number | null>(null)
   let selectedPeople = $state<string[]>([])
-  let shouldResetForce = $state(true)
   let showOnlyTop10 = $state(true)
+  let instance = $state<any>()
 
   const setupScrolly = () => {
     const scroller = scrollama()
@@ -17,23 +17,26 @@
       })
       .onStepEnter(({ element }) => {
         currentStep = Number(element.attributes.getNamedItem('data-step')?.value || currentStep)
+
+        let resetForce = false
+        if (currentStep === null) {
+          return
+        } else if (currentStep === 0) {
+          selectedPeople = []
+        } else if (currentStep === 1) {
+          selectedPeople = ['Christopher Diwata']
+        } else if (currentStep === 2) {
+          selectedPeople = ['Maris Racal', 'Anthony Jennings']
+          showOnlyTop10 = true
+        } else if (currentStep === 3) {
+          selectedPeople = []
+          showOnlyTop10 = false
+          resetForce = true
+        }
+
+        instance.drawSimulation({ resetForce })
       })
   }
-
-  $effect(() => {
-    if (currentStep === 0) {
-      selectedPeople = []
-    } else if (currentStep === 1) {
-      selectedPeople = ['Christopher Diwata']
-    } else if (currentStep === 2) {
-      selectedPeople = ['Maris Racal', 'Anthony Jennings']
-      showOnlyTop10 = true
-    } else if (currentStep === 3) {
-      selectedPeople = []
-      showOnlyTop10 = false
-      shouldResetForce = true
-    }
-  })
 
   onMount(() => {
     setupScrolly()
@@ -45,7 +48,7 @@
 
   <div data-step={0}></div>
 
-  <ChikaPosts bind:selectedPeople bind:shouldResetForce bind:showOnlyTop10 />
+  <ChikaPosts bind:selectedPeople bind:showOnlyTop10 bind:this={instance} />
 
   <div class="spacer"></div>
 

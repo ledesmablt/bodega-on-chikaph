@@ -4,12 +4,7 @@
   import * as d3 from 'd3'
   import _ from 'lodash'
 
-  let {
-    selectedPeople = $bindable<string[]>([]),
-    shouldResetForce = $bindable(true),
-    showOnlyTop10 = $bindable(true)
-  } = $props()
-
+  let { selectedPeople = $bindable<string[]>([]), showOnlyTop10 = $bindable(true) } = $props()
 
   // TODO: plug this into the tailwind theme
   const MIN_VW = 390
@@ -38,7 +33,7 @@
   }
 
   type ChikaPost = any // TODO: fix
-	let chikaPosts = $state<ChikaPost[]>([])
+  let chikaPosts = $state<ChikaPost[]>([])
 
   const maxUps = $derived(d3.max(chikaPosts, (d) => d.ups) ?? 10000)
   const minUps = $derived(d3.min(chikaPosts, (d) => d.ups) ?? 0)
@@ -49,7 +44,7 @@
   let simulation: d3.Simulation<any, any> | null = $state(null)
   let colorMode = $state<ColorMode>('ups')
 
-  const drawContainer = () => {
+  export const drawContainer = () => {
     const container = d3
       .select('#top-10-wrapper')
       .attr('width', containerWidth)
@@ -61,16 +56,17 @@
       .attr('id', 'top-10-group')
   }
 
-  const drawSimulation = () => {
+  interface DrawSimulationOptions {
+    resetForce?: boolean
+  }
+  export const drawSimulation = (opts: DrawSimulationOptions = {}) => {
+    console.info('drawSimulation', opts)
     let nodes = chikaPosts as SimulationNode[]
     if (showOnlyTop10) {
-      // TODO: fix wonky force behavior. d3 selection#filter doesnt seem to be working.
-      // but for some reason when svelte re-mounts after a file change, it behaves completely fine.
       nodes = chikaPosts.filter((post) => post.overall_rank <= 10)
     }
     const g = d3.select('g#top-10-group')
     const orangeGradient = d3.interpolateRgb('#fcdacc', '#ff4500')
-
     const greenGradient = d3.interpolateRgb('#bbf7d0', '#15803d')
     const neutralGradient = d3.interpolateRgb('#e5e7eb', '#111827')
     const redGradient = d3.interpolateRgb('#fecaca', '#dc2626')
@@ -120,7 +116,7 @@
 
     simulation = d3.forceSimulation(nodes).on('tick', onSimulationTick)
 
-    if (shouldResetForce) {
+    if (opts.resetForce) {
       // init the actual physics. this shouldn't be declared twice otherwise
       // even just a color update will physically move the simulation
       const forceStrength = showOnlyTop10 ? 50 : 1
@@ -131,7 +127,6 @@
           'collision',
           d3.forceCollide().radius((d) => upsScale((d as SimulationNode).ups) + 1)
         )
-      shouldResetForce = false
     }
   }
 
@@ -161,32 +156,17 @@
 
   const toggleShowAllPosts = () => {
     showOnlyTop10 = !showOnlyTop10
-    shouldResetForce = true
-    drawSimulation()
+    drawSimulation({ resetForce: true })
   }
 
   onMount(() => {
-		d3.json('/data/2025/redditchika/chika_10.json')
+    d3.json('/data/2025/redditchika/chika_10.json')
       .then((data) => {
         chikaPosts = data as ChikaPost[]
         drawContainer()
-        drawSimulation()
-      }).catch(console.error)
-
-    // NOTE: might have to render all nodes and then flip em off to fix that wonky force issue
-    // showOnlyTop10 = true
-    // drawSimulation({ resetForce: true })
-  })
-
-  // TODO: fix responsiveness
-  $effect(() => {
-    if (chikaPosts.length === 0) {
-      return
-    }
-    if (shouldResetForce) {
-      drawContainer()
-      drawSimulation()
-    }
+        drawSimulation({ resetForce: true })
+      })
+      .catch(console.error)
   })
 </script>
 
@@ -207,7 +187,7 @@
       color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
     </button>
   </div>
-  <svg id="top-10-wrapper" class="mt-2 border border-gray-500 z-1"> </svg>
+  <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
 
   <dialog id="post-dialog" closedby="any">
     {#if selectedPost}
