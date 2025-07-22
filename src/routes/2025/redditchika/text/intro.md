@@ -6,6 +6,6 @@ But among all the Filipino subs I'm familiar with, **r/ChikaPH** in particular s
 
 It's interesting to see pop culture obsession in action — droves of comments with thousands of upvotes, witty comebacks and remarks, posts that rally people together or get polarized responses. While I’m just still way out of the loop with celebrity gossip, I’ve slowly come to appreciate the internet hivemind of r/ChikaPH.
 
-I was curious to see what I might find by diving into the sub. Doing so would also help me catch up with most relevant pop culture topics I missed from the start of 2024. Friends have briefed me about some topics — especially the KathDen breakup and the Maris & Anthony issue — but I don’t know what I don’t know. I felt like I could find the answers on the sub, and that there were a better way than scrolling through 18+ months of data.
+I was curious to see what I might find by diving into the sub. Doing so would also help me catch up with most relevant pop culture topics I missed from the start of 2024. Friends have briefed me about some topics — especially the KathNiel breakup and the Maris & Anthony issue — but I don’t know what I don’t know. I felt like I could find the answers on the sub, and that there were a better way than scrolling through 18+ months of data.
 
 Looking at the top 10 posts from 2024 to June 2025, the topics here would probably ring a bell to people in the know.
