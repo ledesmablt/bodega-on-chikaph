@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Intro from './components/Intro.svx'
+  import Intro from './components/Intro.svelte'
   import PostStory from './components/PostStory.svelte'
-  import Outro from './components/Outro.svx'
+  import Outro from './components/Outro.svelte'
 </script>
 
 {#if typeof window !== 'undefined'}

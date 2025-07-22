@@ -1,8 +1,10 @@
+<script>
+  import OutroText from './_outro.md'
+</script>
+
 <section id="outro" class="mb-20">
   <div class="app-prose">
-
-**TODO write outro / conclusion!** Thanks for reading! :)
-
+    <OutroText/>
   </div>
   <div class="mt-20 text-center">TODO footer / nav</div>
 </section>
