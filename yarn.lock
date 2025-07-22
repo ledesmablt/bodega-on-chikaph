@@ -3266,6 +3266,11 @@ util-deprecate@^1.0.2:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==
 
+uuid@^11.1.0:
+  version "11.1.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.1.0.tgz#9549028be1753bb934fc96e2bca09bb4105ae912"
+  integrity sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==
+
 vary@^1, vary@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
@@ -3278,6 +3283,13 @@ vfile-message@^2.0.4:
   dependencies:
     "@types/unist" "^2.0.0"
     unist-util-stringify-position "^2.0.0"
+
+vite-plugin-devtools-json@^0.2.0:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/vite-plugin-devtools-json/-/vite-plugin-devtools-json-0.2.1.tgz#49d672c9c1a807c8854c0a4903cd40d8f1b18149"
+  integrity sha512-5aiNvf/iLTuLR1dUqoI5CLLGgeK2hd6u+tA+RIp7GUZDyAcM6ECaUEWOOtGpidbcxbkKq++KtmSqA3jhMbPwMA==
+  dependencies:
+    uuid "^11.1.0"
 
 vite@^6.2.6:
   version "6.3.5"
