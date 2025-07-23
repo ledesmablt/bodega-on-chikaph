@@ -9,7 +9,9 @@
     selectedPeople = $bindable<string[]>([]),
     showOnlyTop10 = $bindable(true),
     colorMode = $bindable<ColorMode>('ups'),
-    } = $props()
+    hoveredPostId = $bindable<string | null>(null),
+    selectedPostId = $bindable<string | null>(),
+  } = $props()
 
   // TODO: plug this into the tailwind theme
   const MIN_VW = 390
@@ -42,12 +44,14 @@
   }
 
   let chikaPosts = $state<ChikaPost[]>([])
+  let chikaPostsById = $derived(_.keyBy(chikaPosts, (d) => d.id as string))
 
   const maxUps = $derived(d3.max(chikaPosts, (d) => d.ups) ?? 10000)
   // const minUps = $derived(d3.min(chikaPosts, (d) => d.ups) ?? 0)
 
-  let activePostId = $state<string | null>(null)
-  let selectedPost: ChikaPost | null = $state(null)
+  let selectedPost = $derived(chikaPostsById[selectedPostId ?? ''])
+  let openedPostId: string | null = $state(null)
+  let openedPost = $derived(chikaPostsById[openedPostId ?? ''])
   let simulation: d3.Simulation<any, any> | null = $state(null)
   let simulationEnded = $state(true)
 
@@ -68,6 +72,7 @@
   }
   export const drawSimulation = (opts: DrawSimulationOptions = {}) => {
     console.info('drawSimulation', opts)
+    // TODO: move outside of this function?
     let nodes = chikaPosts as SimulationNode[]
     let minUps = 0
     if (showOnlyTop10) {
@@ -108,10 +113,23 @@
 
     const getCircleRadius = (d: SimulationNode) => {
       let size = sizeScale(d.ups)
-      // if (activePostId === d.id) {
+      // if (selectedPostId === d.id) {
       //   size = size * 2
-      // } 
+      // }
       return size
+    }
+
+    const drawPostPreview = () => {
+      const post = d3.select('#post-preview')
+      if (selectedPostId && !post.empty()) {
+        const node = nodes.find((d) => d.id === selectedPostId)
+        if (!node) {
+          return
+        }
+        // TODO: improve positioning
+        post.style('top', `${node.y + 40}px`)
+        post.style('left', `${node.x}px`)
+      }
     }
 
     const onSimulationTick = () => {
@@ -119,20 +137,28 @@
         .data(nodes, (d) => (d as ChikaPost).id)
         .join('circle')
         .classed('top-10-item', true)
+        .classed('with-stroke', (d) => selectedPostId === d.id)
         .on('click', (_event, d) => {
-          onOpenDialog(d)
+          if (selectedPostId === d.id) {
+            onOpenDialog(d)
+          } else {
+            selectedPostId = d.id
+            drawPostPreview()
+          }
         })
         .on('mouseenter', (_event, d) => {
-          activePostId = d.id
+          hoveredPostId = d.id
         })
         .on('mouseleave', () => {
-          activePostId = null
+          hoveredPostId = null
         })
         .attr('fill', (d) => getFill(d))
         .attr('r', (d) => getCircleRadius(d))
         .attr('cx', (d) => d.x ?? 0)
         .attr('cy', (d) => d.y ?? 0)
         .attr('opacity', 1)
+
+      drawPostPreview()
     }
 
     simulation = d3
@@ -140,9 +166,8 @@
       .on('tick', onSimulationTick)
       .on('end', () => {
         simulationEnded = true
-        console.log('end')
+        drawPostPreview()
       })
-
 
     // TODO: simluation doesn't push other circles away
     if (opts.resetForce || simulationEnded) {
@@ -164,12 +189,12 @@
   }
 
   const onOpenDialog = (post: ChikaPost) => {
-    selectedPost = post
+    openedPostId = post.id
     const dialog = getModal()
     dialog.showModal()
   }
   const onCloseDialog = () => {
-    selectedPost = null
+    openedPostId = null
     const dialog = getModal()
     dialog.close()
   }
@@ -199,8 +224,19 @@
   })
 </script>
 
-<div class="sticky top-1/2 w-full transform-[translateY(-50%)]" bind:clientWidth={containerWidth}>
-  <div id="controls" class='hidden'>
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
+<div
+  class="sticky top-1/2 w-full transform-[translateY(-50%)]"
+  bind:clientWidth={containerWidth}
+  onclick={(e) => {
+    const target = e.target as SVGElement | HTMLElement
+    const className = target.getAttribute('class') ?? ''
+    if (!className.includes('top-10-item')) {
+      selectedPostId = null
+    }
+  }}
+>
+  <div id="controls" class="hidden">
     <button
       id="toggle-top10"
       class="border-gray cursor-pointer rounded border p-2"
@@ -223,27 +259,38 @@
   </div>
   <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
 
+  {#if selectedPost}
+    <button id="post-preview" onclick={() => onOpenDialog(selectedPost)}>
+      <p class="line-clamp-1">{selectedPost.title}</p>
+      {#if selectedPost.people.length > 0}
+        <p class="line-clamp-1">Subject: {selectedPost.people.join(', ')}</p>
+      {/if}
+      <p>Vibe: {selectedPost.reaction}</p>
+      <p><i>(click for more details)</i></p>
+    </button>
+  {/if}
+
   <dialog id="post-dialog" closedby="any">
-    {#if selectedPost}
+    {#if openedPost}
       <div class="flex w-full">
         <button class="ml-auto cursor-pointer" onclick={onCloseDialog}>x</button>
       </div>
-      <h3 class="text-2xl font-semibold">{selectedPost.title}</h3>
+      <h3 class="text-2xl font-semibold">{openedPost.title}</h3>
       <div class="font-mono">
         <p class="text-sm text-gray-600">
-          Posted on: {new Date(selectedPost.date).toLocaleDateString()}
+          Posted on: {new Date(openedPost.date).toLocaleDateString()}
         </p>
-        <p class="text-sm">{selectedPost.ups.toLocaleString()} upvotes</p>
+        <p class="text-sm">{openedPost.ups.toLocaleString()} upvotes</p>
       </div>
 
-      {#if selectedPost.selftext}
+      {#if openedPost.selftext}
         <div id="post-selftext" class="flex flex-col gap-2 py-4 text-sm">
-          {@html marked(selectedPost.selftext)}
+          {@html marked(openedPost.selftext)}
         </div>
       {/if}
       <div class="mb-4 flex justify-center">
         <a
-          href={selectedPost.permalink}
+          href={openedPost.permalink}
           target="_blank"
           rel="noopener noreferrer"
           class="text-blue-500 hover:underline"
@@ -256,7 +303,7 @@
 </div>
 
 <style>
-  dialog {
+  dialog#post-dialog {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -273,8 +320,18 @@
     }
   }
 
-  dialog::backdrop {
+  dialog#post-dialog::backdrop {
     background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  #post-preview {
+    background-color: black;
+    color: white;
+    width: 320px;
+    padding: 16px 24px;
+    position: fixed;
+    text-align: left;
+    cursor: pointer;
   }
 
   :global {
@@ -283,10 +340,14 @@
         transition: fill 0.2s ease;
         cursor: pointer;
         &:hover {
-          /* fill: #ff4500; */
-          stroke: #000;
+          stroke: black;
           stroke-width: 2px;
         }
+      }
+
+      .with-stroke {
+        stroke: #000;
+        stroke-width: 2px;
       }
 
       .date-label {
