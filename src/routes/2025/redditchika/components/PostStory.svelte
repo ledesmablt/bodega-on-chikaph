@@ -12,31 +12,38 @@
     const scroller = scrollama()
     scroller
       .setup({
-        step: 'section#posts-story [data-step]',
-        offset: 0.7
+        step: 'section#posts-story .story-step',
+        offset: 0.7,
       })
-      .onStepEnter(({ element }) => {
-        currentStep = Number(element.attributes.getNamedItem('data-step')?.value || currentStep)
+      .onStepEnter(({ element, index }) => {
+        currentStep = index
+        const dataPeople = element.attributes.getNamedItem('data-selected-people')?.value
+        const dataResetForce = element.attributes.getNamedItem('data-reset-force')?.value
 
         let resetForce = false
         if (currentStep === null) {
           return
-        } else if (currentStep === 0) {
-          selectedPeople = []
-        } else if (currentStep === 1) {
-          selectedPeople = ['Christopher Diwata']
-        } else if (currentStep === 2) {
-          selectedPeople = ['Maris Racal', 'Anthony Jennings']
-          showOnlyTop10 = true
-        } else if (currentStep === 3) {
-          selectedPeople = []
+        }
+
+        if (currentStep >= 3) {
           showOnlyTop10 = false
-          resetForce = true
+        } else {
+          showOnlyTop10 = true
+        }
+
+        if (typeof dataPeople === 'string') {
+          selectedPeople = dataPeople.split(', ').filter(Boolean)
+        }
+
+        if (typeof dataResetForce === 'string') {
+          resetForce = dataResetForce === 'true'
         }
 
         instance.drawSimulation({ resetForce })
       })
   }
+
+  $inspect(selectedPeople)
 
   onMount(() => {
     setupScrolly()
@@ -46,13 +53,11 @@
 <section id="posts-story" class="flex w-full max-w-screen flex-col items-center">
   <div class="h-[40vh]"></div>
 
-  <div data-step={0}></div>
+  <div class='story-step'></div>
 
   <ChikaPosts bind:selectedPeople bind:showOnlyTop10 bind:this={instance} />
 
-  <div class="spacer"></div>
-
-  <div class="story-step" data-step={1}>
+  <div class="story-step storyblock with-spacer" data-selected-people='Christopher Diwata'>
     <p>
       The most upvoted post of all-time on the subreddit has people celebrating the recent brand
       deals and successes of <strong>Christopher Diwata</strong>, AKA “what hafen vella?,” “Taylor
@@ -60,9 +65,7 @@
     </p>
   </div>
 
-  <div class="spacer"></div>
-
-  <div class="story-step" data-step={2}>
+  <div class="story-step storyblock with-spacer" data-selected-people='Maris Racal, Anthony Jennings'>
     <p>
       The <strong>Anthony & Maris</strong> issue last year also made huge waves—at the time it felt like
       everyone was glued to their screens waiting for the next update, spilling new info and tea over
@@ -71,9 +74,7 @@
     </p>
   </div>
 
-  <div class="spacer"></div>
-
-  <div class="story-step" data-step={3}>
+  <div class="story-step storyblock with-spacer" data-selected-people=''>
     <p>
       Is there more to ChikaPH than celebrities and politics? Does the sub tend to talk about
       certain people or topics over others?
@@ -84,13 +85,39 @@
     </p>
   </div>
 
-  <div class="spacer"></div>
+  <div class="story-step storyblock with-spacer" data-selected-people='Christopher Diwata, Maris Racal, Anthony Jennings'>
+    <p>
+      Who's talked about the most often?
+    </p>
+    <p>
+      <strong>Christopher Diwata</strong> and <strong>Anthony & Maris</strong> are mentioned a fair bit in the hottest posts...
+    </p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-selected-people='Leni Robredo, Vico Sotto'>
+    <p>
+      Politicians like <strong>Leni Robredo</strong> and <strong>Vico Sotto</strong> also have their share of screen time.
+    </p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-selected-people='Kathryn Bernardo'>
+    <p>
+      <strong>Kathryn Bernardo</strong> is the most mentioned and upvoted person in r/ChikaPH.
+    </p>
+    <p>note: could make this a little quiz?</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-selected-people=''>
+    <p>
+      While ChikaPH is mainly a gossip subreddit, people don’t just respond strongly to shock and speculation.
+    </p>
+  </div>
 
   <div class="h-[2000px]"></div>
 </section>
 
 <style>
-  .story-step {
+  .storyblock {
     background-color: var(--color-gray-500);
     color: #f9fafb;
     padding: 12px 24px;
@@ -103,7 +130,7 @@
     line-height: 24px;
   }
 
-  .spacer {
-    height: 80vh;
+  .with-spacer {
+    margin-bottom: 80vh;
   }
 </style>

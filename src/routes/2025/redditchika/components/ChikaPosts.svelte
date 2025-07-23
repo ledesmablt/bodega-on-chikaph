@@ -211,6 +211,11 @@
       color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
     </button>
   </div>
+  <div id="active-filters" class="min-h-8">
+    {#if selectedPeople.length > 0}
+      <p>highlighted: {selectedPeople.join(', ')}</p>
+    {/if}
+  </div>
   <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
 
   <dialog id="post-dialog" closedby="any">
