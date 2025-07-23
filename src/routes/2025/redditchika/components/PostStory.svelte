@@ -124,9 +124,9 @@
   </div>
 
   <div class="story-step storyblock with-spacer" data-selected-people='' data-color-mode='sentiment'>
-    <p><strong class='text-green-500'>Green</strong> circles are posts with mostly <span class='text-green-500'>positive</span> reactions like excitement and support.</p> 
-    <p><strong class='text-red-500'>Red</strong> circles are posts with mostly <span class='text-red-500'>negative</span> reactions like anger, sadness, and annoyance.</p> 
-    <p><strong class='text-gray-800'>Gray</strong> circles are posts with <span class='text-gray-800'>mixed or ambiguous</span> reactions like feeling shocked or simply interested.</p> 
+    <p><strong class='px-1 bg-green-500'>Green</strong> circles are posts with mostly <strong class='px-1 bg-green-500'>positive</strong> reactions like excitement and support.</p> 
+    <p><strong class='px-1 bg-red-500'>Red</strong> circles are posts with mostly <strong class='px-1 bg-red-500'>negative</strong> reactions like anger, sadness, and annoyance.</p> 
+    <p><strong class='px-1 bg-gray-700'>Gray</strong> circles are posts with <strong class='px-1 bg-gray-700'>mixed or ambiguous</strong> reactions like feeling shocked or simply interested.</p> 
   </div>
 
   <div class="story-step storyblock with-spacer">

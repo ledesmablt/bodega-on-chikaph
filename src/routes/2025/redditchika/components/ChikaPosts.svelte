@@ -69,11 +69,14 @@
   export const drawSimulation = (opts: DrawSimulationOptions = {}) => {
     console.info('drawSimulation', opts)
     let nodes = chikaPosts as SimulationNode[]
+    let minUps = 0
     if (showOnlyTop10) {
       nodes = chikaPosts.filter((post) => post.overall_rank <= 10)
+      minUps = 5000
+    } else {
+      minUps = d3.min(nodes, (d) => d.ups)
     }
     const g = d3.select('g#top-10-group')
-    const minUps = (d3.min(nodes, (d) => d.ups) ?? 0)
     const sizeScale = d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR])
 
     const getFill = (d: ChikaPost): string => {
