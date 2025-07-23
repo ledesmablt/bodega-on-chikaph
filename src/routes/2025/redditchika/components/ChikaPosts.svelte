@@ -40,8 +40,10 @@
 
   type SimulationNode = ChikaPost & d3.SimulationNodeDatum
   type ColorMode = 'ups' | 'sentiment'
+  let activePostId = $state<string | null>(null)
   let selectedPost: ChikaPost | null = $state(null)
   let simulation: d3.Simulation<any, any> | null = $state(null)
+  let simulationEnded = $state(true)
   let colorMode = $state<ColorMode>('ups')
 
   export const drawContainer = () => {
@@ -99,6 +101,14 @@
       return defaultColor
     }
 
+    const getCircleRadius = (d: SimulationNode) => {
+      let size = upsScale(d.ups)
+      // if (activePostId === d.id) {
+      //   size = size * 2
+      // } 
+      return size
+    }
+
     const onSimulationTick = () => {
       g.selectAll('circle.top-10-item')
         .data(nodes, (d) => (d as ChikaPost).id)
@@ -107,16 +117,30 @@
         .on('click', (_event, d) => {
           onOpenDialog(d)
         })
+        .on('mouseenter', (_event, d) => {
+          activePostId = d.id
+        })
+        .on('mouseleave', () => {
+          activePostId = null
+        })
         .attr('fill', (d) => getFill(d))
-        .attr('r', (d) => upsScale(d.ups))
+        .attr('r', (d) => getCircleRadius(d))
         .attr('cx', (d) => d.x ?? 0)
         .attr('cy', (d) => d.y ?? 0)
         .attr('opacity', 1)
     }
 
-    simulation = d3.forceSimulation(nodes).on('tick', onSimulationTick)
+    simulation = d3
+      .forceSimulation(nodes)
+      .on('tick', onSimulationTick)
+      .on('end', () => {
+        simulationEnded = true
+        console.log('end')
+      })
 
-    if (opts.resetForce) {
+
+    // TODO: simluation doesn't push other circles away
+    if (opts.resetForce || simulationEnded) {
       // init the actual physics. this shouldn't be declared twice otherwise
       // even just a color update will physically move the simulation
       const forceStrength = showOnlyTop10 ? 50 : 1
@@ -125,7 +149,7 @@
         .force('charge', d3.forceManyBody().strength(forceStrength))
         .force(
           'collision',
-          d3.forceCollide().radius((d) => upsScale((d as SimulationNode).ups) + 1)
+          d3.forceCollide().radius((d) => getCircleRadius(d) + 1)
         )
     }
   }
