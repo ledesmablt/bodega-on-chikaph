@@ -13,15 +13,20 @@
 {/if}
 
 <style>
+  /* import Reddit Sans */
+  @import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
+
   :global {
     article#redditchika_2025 {
       --font-serif: IBM Plex Serif;
-      --font-sans: IBM Plex Sans;
+      /* --font-sans: IBM Plex Sans; */
+      --font-sans: Reddit Sans;
       --font-mono: IBM Plex Mono;
 
       width: 100%;
       max-width: 640px;
       margin: 0 auto;
+      font-family: Reddit Sans;
 
       ::selection {
         background: #fcdacc;
