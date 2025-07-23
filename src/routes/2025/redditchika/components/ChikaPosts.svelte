@@ -3,8 +3,13 @@
   import { marked } from 'marked'
   import * as d3 from 'd3'
   import _ from 'lodash'
+  import type { ColorMode, ChikaPost, SimulationNode } from './_types'
 
-  let { selectedPeople = $bindable<string[]>([]), showOnlyTop10 = $bindable(true) } = $props()
+  let {
+    selectedPeople = $bindable<string[]>([]),
+    showOnlyTop10 = $bindable(true),
+    colorMode = $bindable<ColorMode>('ups'),
+    } = $props()
 
   // TODO: plug this into the tailwind theme
   const MIN_VW = 390
@@ -16,6 +21,10 @@
   const maxCircleScale = d3.scaleLinear(vwDomain, [20, 40]).clamp(true)
   const minCircleR = $derived(minCircleScale(containerWidth))
   const maxCircleR = $derived(maxCircleScale(containerWidth))
+  const orangeGradient = d3.interpolateRgb('#fcdacc', '#ff4500')
+  const greenGradient = d3.interpolateRgb('#bbf7d0', '#15803d')
+  const neutralGradient = d3.interpolateRgb('#e5e7eb', '#374151')
+  const redGradient = d3.interpolateRgb('#fecaca', '#dc2626')
 
   const REACTIONS: Record<string, string> = {
     respect: 'positive',
@@ -32,19 +41,15 @@
     angry: 'negative'
   }
 
-  type ChikaPost = any // TODO: fix
   let chikaPosts = $state<ChikaPost[]>([])
 
   const maxUps = $derived(d3.max(chikaPosts, (d) => d.ups) ?? 10000)
-  const minUps = $derived(d3.min(chikaPosts, (d) => d.ups) ?? 0)
+  // const minUps = $derived(d3.min(chikaPosts, (d) => d.ups) ?? 0)
 
-  type SimulationNode = ChikaPost & d3.SimulationNodeDatum
-  type ColorMode = 'ups' | 'sentiment'
   let activePostId = $state<string | null>(null)
   let selectedPost: ChikaPost | null = $state(null)
   let simulation: d3.Simulation<any, any> | null = $state(null)
   let simulationEnded = $state(true)
-  let colorMode = $state<ColorMode>('ups')
 
   export const drawContainer = () => {
     const container = d3
@@ -68,11 +73,8 @@
       nodes = chikaPosts.filter((post) => post.overall_rank <= 10)
     }
     const g = d3.select('g#top-10-group')
-    const orangeGradient = d3.interpolateRgb('#fcdacc', '#ff4500')
-    const greenGradient = d3.interpolateRgb('#bbf7d0', '#15803d')
-    const neutralGradient = d3.interpolateRgb('#e5e7eb', '#111827')
-    const redGradient = d3.interpolateRgb('#fecaca', '#dc2626')
-    const upsScale = d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR])
+    const minUps = (d3.min(nodes, (d) => d.ups) ?? 0)
+    const sizeScale = d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR])
 
     const getFill = (d: ChikaPost): string => {
       const defaultColor = 'black'
@@ -102,7 +104,7 @@
     }
 
     const getCircleRadius = (d: SimulationNode) => {
-      let size = upsScale(d.ups)
+      let size = sizeScale(d.ups)
       // if (activePostId === d.id) {
       //   size = size * 2
       // } 
@@ -195,7 +197,7 @@
 </script>
 
 <div class="sticky top-1/2 w-full transform-[translateY(-50%)]" bind:clientWidth={containerWidth}>
-  <div id="controls">
+  <div id="controls" class='hidden'>
     <button
       id="toggle-top10"
       class="border-gray cursor-pointer rounded border p-2"
