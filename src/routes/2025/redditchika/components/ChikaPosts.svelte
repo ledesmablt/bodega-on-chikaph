@@ -352,10 +352,8 @@
     </button>
   </div>
   <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
-  <div id="active-filters" class="min-h-8">
-    {#if selectedPeople.length > 0}
-      <p>highlighted: {selectedPeople.join(', ')}</p>
-    {/if}
+  <div id="active-filters" class="mt-2">
+    <p>TODO: expose filters here?</p>
   </div>
 
   {#if selectedPost}
