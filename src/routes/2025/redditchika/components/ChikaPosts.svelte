@@ -123,15 +123,41 @@
 
   const drawPostPreview = () => {
     const post = d3.select('#post-preview')
-    if (selectedPostId && !post.empty()) {
-      const node = nodesById[selectedPostId]
-      if (!node) {
-        return
-      }
-      // TODO: improve positioning
-      // is there a way to do this with `.data` & `.join` so we get a smooth `node.radius` transition
-      post.style('top', `${node.y + 40}px`)
+    if (!selectedPostId) {
+      return
+    }
+
+    // TODO: on desktop, preview on hovered post instead of selected
+    const node = nodesById[selectedPostId]
+    if (!node) {
+      return
+    }
+
+    // TODO: improve positioning
+    // TODO: is there a way to do this with `.data` & `.join` so we get a smooth `node.radius` transition
+    // TODO: hovering over the preview box itself "resizes" the circle, which is pretty annoying...
+    const boxWidth = 320
+    const boxHeight = 132
+    // TODO: make this smaller on mobile
+    post.style('width', `${boxWidth}px`)
+    post.style('height', `${boxHeight}px`)
+    post.style('padding', '16px 24px')
+
+    const padding = 12
+    post.style('top', `${node.y + node.radius + padding}px`)
+
+    // default left aligned
+    const withinRightBound = node.x + boxWidth <= containerWidth
+    if (withinRightBound) {
       post.style('left', `${node.x}px`)
+    } else {
+      // right align
+      const withinLeftBound = node.x >= boxWidth
+      if (withinLeftBound) {
+        post.style('left', `${node.x - boxWidth}px`)
+      } else {
+        post.style('left', '0px')
+      }
     }
   }
 
@@ -325,12 +351,12 @@
       color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
     </button>
   </div>
+  <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
   <div id="active-filters" class="min-h-8">
     {#if selectedPeople.length > 0}
       <p>highlighted: {selectedPeople.join(', ')}</p>
     {/if}
   </div>
-  <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
 
   {#if selectedPost}
     <button id="post-preview" onclick={() => onOpenDialog(selectedPost)}>
@@ -400,8 +426,6 @@
   #post-preview {
     background-color: black;
     color: white;
-    width: 320px;
-    padding: 16px 24px;
     position: fixed;
     text-align: left;
     cursor: pointer;
