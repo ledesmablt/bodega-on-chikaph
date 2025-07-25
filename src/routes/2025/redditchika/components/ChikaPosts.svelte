@@ -17,6 +17,7 @@
   const MIN_VW = 390
   const MAX_VW = 640
   const vwDomain = [MIN_VW, MAX_VW]
+  let mouse = $state([0,0])
   let containerWidth = $state(MAX_VW)
   let containerHeight = $derived(containerWidth)
   const minCircleScale = d3.scaleLinear(vwDomain, [5, 8]).clamp(true)
@@ -186,6 +187,9 @@
           d3.select(this).transition().duration(200).attr('r', d.radius)
           onReheatSimulation({ resetForce: true })
         })
+        .on('mousemove', (e) => {
+            mouse = d3.pointer(e)
+        })
 
       // draw this on every tick so that the preview shifts with the node's position
       drawPostPreview()
@@ -237,6 +241,16 @@
       .on('end', () => {
         drawPostPreview()
       })
+
+    simulation.force('followMouse', (alpha) => {
+      const hoveredNode = nodesById[hoveredPostId]
+      if (!hoveredNode) {
+        return
+      }
+
+      hoveredNode.vx += (mouse[0] - hoveredNode.x) * 0.15 * alpha
+      hoveredNode.vy += (mouse[1] - hoveredNode.y) * 0.15 * alpha
+    })
 
     if (opts.resetForce) {
       onReheatSimulation(opts)
