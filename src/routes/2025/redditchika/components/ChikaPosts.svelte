@@ -10,7 +10,7 @@
     showOnlyTop10 = $bindable(true),
     colorMode = $bindable<ColorMode>('ups'),
     hoveredPostId = $bindable<string | null>(null),
-    selectedPostId = $bindable<string | null>(),
+    selectedPostId = $bindable<string | null>()
   } = $props()
 
   // TODO: plug this into the tailwind theme
@@ -44,16 +44,69 @@
   }
 
   let chikaPosts = $state<ChikaPost[]>([])
-  let chikaPostsById = $derived(_.keyBy(chikaPosts, (d) => d.id as string))
+  const maxUps = 11507
+  const minUps = $derived(showOnlyTop10 ? 5000 : 1579)
+  const radiusScale = $derived(d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR]))
 
-  const maxUps = $derived(d3.max(chikaPosts, (d) => d.ups) ?? 10000)
-  // const minUps = $derived(d3.min(chikaPosts, (d) => d.ups) ?? 0)
-
-  let selectedPost = $derived(chikaPostsById[selectedPostId ?? ''])
-  let openedPostId: string | null = $state(null)
-  let openedPost = $derived(chikaPostsById[openedPostId ?? ''])
   let simulation: d3.Simulation<any, any> | null = $state(null)
-  let simulationEnded = $state(true)
+
+  const getFill = (d: ChikaPost): string => {
+    const defaultColor = 'black'
+    const ratio = (d.ups - minUps) / (maxUps - minUps)
+
+    const hasPeopleOverlap = _.intersection(d.people, selectedPeople).length == 0
+    if (selectedPeople.length > 0 && hasPeopleOverlap) {
+      // color only selected people, otherwise grey the rest out
+      return '#e5e7eb'
+    }
+
+    if (colorMode === 'ups') {
+      return orangeGradient(ratio)
+    } else if (colorMode === 'sentiment') {
+      switch (REACTIONS[d.reaction ?? '']) {
+        case 'positive':
+          return greenGradient(ratio)
+        case 'neutral':
+          return neutralGradient(ratio)
+        case 'negative':
+          return redGradient(ratio)
+        default:
+          return defaultColor
+      }
+    }
+
+    return defaultColor
+  }
+
+  const getNodes = (): SimulationNode[] => {
+    const simNodes = simulation?.nodes()
+    const stillTop10 = simNodes?.length === 10
+    if (!showOnlyTop10 && stillTop10) {
+      return chikaPosts.map((node) => ({
+        ...node,
+        radius: radiusScale(node.ups)
+      }))
+    }
+
+    if (!simNodes) {
+      // article starts with showOnlyTop10
+      return chikaPosts
+        .filter((node) => node.overall_rank <= 10)
+        .map((node) => ({
+          ...node,
+          radius: radiusScale(node.ups)
+        }))
+    }
+
+    // default to using the simulation nodes, which already have position & vector
+    return simNodes
+  }
+
+  let nodes = $derived(getNodes())
+  let nodesById = $derived(_.keyBy(nodes, (d) => d.id as string))
+  let selectedPost = $derived(nodesById[selectedPostId ?? ''])
+  let openedPostId: string | null = $state(null)
+  let openedPost = $derived(nodesById[openedPostId ?? ''])
 
   export const drawContainer = () => {
     const container = d3
@@ -67,120 +120,126 @@
       .attr('id', 'top-10-group')
   }
 
+  const drawPostPreview = () => {
+    const post = d3.select('#post-preview')
+    if (selectedPostId && !post.empty()) {
+      const node = nodesById[selectedPostId]
+      if (!node) {
+        return
+      }
+      // TODO: improve positioning
+      // is there a way to do this with `.data` & `.join` so we get a smooth `node.radius` transition
+      post.style('top', `${node.y + 40}px`)
+      post.style('left', `${node.x}px`)
+    }
+  }
+
   interface DrawSimulationOptions {
     resetForce?: boolean
   }
   export const drawSimulation = (opts: DrawSimulationOptions = {}) => {
     console.info('drawSimulation', opts)
-    // TODO: move outside of this function?
-    let nodes = chikaPosts as SimulationNode[]
-    let minUps = 0
-    if (showOnlyTop10) {
-      nodes = chikaPosts.filter((post) => post.overall_rank <= 10)
-      minUps = 5000
-    } else {
-      minUps = d3.min(nodes, (d) => d.ups)
-    }
     const g = d3.select('g#top-10-group')
-    const sizeScale = d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR])
 
-    const getFill = (d: ChikaPost): string => {
-      const defaultColor = 'black'
-      const ratio = (d.ups - minUps) / (maxUps - minUps)
-
-      if (selectedPeople.length > 0 && _.intersection(d.people, selectedPeople).length == 0) {
-        // color only selected people, otherwise grey the rest out
-        return '#e5e7eb'
-      }
-
-      if (colorMode === 'ups') {
-        return orangeGradient(ratio)
-      } else if (colorMode === 'sentiment') {
-        switch (REACTIONS[d.reaction ?? '']) {
-          case 'positive':
-            return greenGradient(ratio)
-          case 'neutral':
-            return neutralGradient(ratio)
-          case 'negative':
-            return redGradient(ratio)
-          default:
-            return defaultColor
-        }
-      }
-
-      return defaultColor
-    }
-
-    const getCircleRadius = (d: SimulationNode) => {
-      let size = sizeScale(d.ups)
-      // if (selectedPostId === d.id) {
-      //   size = size * 2
-      // }
-      return size
-    }
-
-    const drawPostPreview = () => {
-      const post = d3.select('#post-preview')
-      if (selectedPostId && !post.empty()) {
-        const node = nodes.find((d) => d.id === selectedPostId)
-        if (!node) {
-          return
-        }
-        // TODO: improve positioning
-        post.style('top', `${node.y + 40}px`)
-        post.style('left', `${node.x}px`)
-      }
-    }
+    // draw the circles
+    const circles = g
+      .selectChildren('circle')
+      .data(nodes, (d) => (d as ChikaPost).id)
+      .join('circle')
+      .classed('top-10-item', true)
+      .attr('r', (d) => d.radius)
+      .attr('fill', (d) => getFill(d))
 
     const onSimulationTick = () => {
-      g.selectAll('circle.top-10-item')
-        .data(nodes, (d) => (d as ChikaPost).id)
-        .join('circle')
-        .classed('top-10-item', true)
+      circles
         .classed('with-stroke', (d) => selectedPostId === d.id)
+        // force simulation sets these values
+        .attr('cx', (d) => d.x)
+        .attr('cy', (d) => d.y)
         .on('click', (_event, d) => {
-          if (selectedPostId === d.id) {
+          const alreadySelected = selectedPostId === d.id
+          if (alreadySelected) {
             onOpenDialog(d)
           } else {
             selectedPostId = d.id
             drawPostPreview()
           }
         })
-        .on('mouseenter', (_event, d) => {
+        .on('mouseenter', function (_event, d) {
           hoveredPostId = d.id
+          if (d.upsized) {
+            return
+          }
+          d.upsized = true
+          // double the radius (or at least make it big enough)
+          d.radius = Math.max(d.radius * 2, maxCircleR)
+          d3.select(this).transition().duration(200).attr('r', d.radius)
+          onReheatSimulation({ resetForce: true })
         })
-        .on('mouseleave', () => {
+        .on('mouseleave', function (_event, d) {
           hoveredPostId = null
+          if (!d.upsized) {
+            return
+          }
+          d.upsized = false
+          d.radius = d.radius / 2
+          d3.select(this).transition().duration(200).attr('r', d.radius)
+          onReheatSimulation({ resetForce: true })
         })
-        .attr('fill', (d) => getFill(d))
-        .attr('r', (d) => getCircleRadius(d))
-        .attr('cx', (d) => d.x ?? 0)
-        .attr('cy', (d) => d.y ?? 0)
-        .attr('opacity', 1)
 
+      // draw this on every tick so that the preview shifts with the node's position
       drawPostPreview()
+    }
+
+    const onReheatSimulation = (opts: DrawSimulationOptions) => {
+      if (!simulation) {
+        return
+      }
+
+      simulation
+        // shoot for the center of the box
+        .force('center', d3.forceCenter(containerWidth / 2, containerHeight / 2))
+        // make sure circles don't bump into each other, and give the upsized ones a bit more space
+        .force(
+          'collision',
+          d3.forceCollide((d) => (d.upsized ? d.radius + 4 : d.radius + 2))
+        )
+
+      if (opts.resetForce) {
+        simulation
+          // draw the top 10 circles together faster.
+          // calling #force again will "reset" the "charge", causing the
+          // circles to move towards the center.
+          .force('charge', d3.forceManyBody().strength(nodes.length === 10 ? 50 : 1))
+      }
+
+      // actually restart the simulation
+      simulation.alpha(1).restart()
+    }
+
+    const getAlpha = () => {
+      if (!simulation) {
+        return 1
+      }
+      if (opts.resetForce) {
+        return 1
+      } else {
+        // we want to use the ongoing simulation's alpha when appropriate so we don't
+        // "reheat" the simulation over and over.
+        return simulation.alpha()
+      }
     }
 
     simulation = d3
       .forceSimulation(nodes)
+      .alpha(getAlpha())
       .on('tick', onSimulationTick)
       .on('end', () => {
-        simulationEnded = true
         drawPostPreview()
       })
 
-    // TODO: simluation doesn't push other circles away
-    if (opts.resetForce || simulationEnded) {
-      // init the actual physics. this shouldn't be declared twice otherwise
-      // even just a color update will physically move the simulation
-      const forceStrength = showOnlyTop10 ? 50 : 1
-      simulation
-        .force('center', d3.forceCenter(containerWidth / 2, containerHeight / 2))
-        .force('charge', d3.forceManyBody().strength(forceStrength))
-        .force(
-          'collision',
-          d3.forceCollide().radius((d) => getCircleRadius(d) + 1)
-        )
+    if (opts.resetForce) {
+      onReheatSimulation(opts)
     }
   }
 

@@ -20,36 +20,30 @@
       .onStepEnter(({ element, index }) => {
         currentStep = index
         const dataPeople = element.attributes.getNamedItem('data-selected-people')?.value
-        const dataResetForce = element.attributes.getNamedItem('data-reset-force')?.value
         const dataColorMode = element.attributes.getNamedItem('data-color-mode')?.value
 
-        let resetForce = false
         if (currentStep === null) {
           return
         }
 
-        if (currentStep >= 3) {
+        if (currentStep === 3) {
           // no turning back
           showOnlyTop10 = false
+          instance.drawSimulation({ resetForce: true })
         }
 
         if (typeof dataPeople === 'string') {
           selectedPeople = dataPeople.split(', ').filter(Boolean)
-        }
-
-        if (typeof dataResetForce === 'string') {
-          resetForce = dataResetForce === 'true'
+          instance.drawSimulation()
         }
 
         if (typeof dataColorMode === 'string') {
           colorMode = dataColorMode as ColorMode
+          instance.drawSimulation()
         }
 
-        instance.drawSimulation({ resetForce })
       })
   }
-
-  $inspect(selectedPeople)
 
   onMount(() => {
     setupScrolly()
