@@ -3,15 +3,26 @@
   import { marked } from 'marked'
   import * as d3 from 'd3'
   import _ from 'lodash'
-  import type { ColorMode, ChikaPost, SimulationNode } from './_types'
+  import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
 
   let {
     selectedPeople = $bindable<string[]>([]),
     showOnlyTop10 = $bindable(true),
     colorMode = $bindable<ColorMode>('ups'),
+    selectedSentiments = $bindable<Sentiment[]>([]),
     hoveredPostId = $bindable<string | null>(null),
-    selectedPostId = $bindable<string | null>()
+    selectedPostId = $bindable<string | null>(),
   } = $props()
+
+  const COLORS = {
+    black: 'black',
+    lightGrey: '#e5e7eb',
+    lightOrange: '#fcdacc',
+    darkOrange: '#ff4500',
+    green: '#22c55e',
+    red: '#f87171',
+    grey: '#6b7280',
+  } as const
 
   // TODO: plug this into the tailwind theme
   const MIN_VW = 390
@@ -24,10 +35,7 @@
   const maxCircleScale = d3.scaleLinear(vwDomain, [20, 40]).clamp(true)
   const minCircleR = $derived(minCircleScale(containerWidth))
   const maxCircleR = $derived(maxCircleScale(containerWidth))
-  const orangeGradient = d3.interpolateRgb('#fcdacc', '#ff4500')
-  const greenGradient = d3.interpolateRgb('#bbf7d0', '#15803d')
-  const neutralGradient = d3.interpolateRgb('#e5e7eb', '#374151')
-  const redGradient = d3.interpolateRgb('#fecaca', '#dc2626')
+  const orangeGradient = d3.interpolateRgb(COLORS.lightOrange, COLORS.darkOrange)
 
   const REACTIONS: Record<string, string> = {
     respect: 'positive',
@@ -52,25 +60,29 @@
   let simulation: d3.Simulation<any, any> | null = $state(null)
 
   const getFill = (d: ChikaPost): string => {
-    const defaultColor = 'black'
+    const defaultColor = COLORS.black
     const ratio = (d.ups - minUps) / (maxUps - minUps)
 
     const hasPeopleOverlap = _.intersection(d.people, selectedPeople).length == 0
     if (selectedPeople.length > 0 && hasPeopleOverlap) {
       // color only selected people, otherwise grey the rest out
-      return '#e5e7eb'
+      return COLORS.lightGrey
     }
 
     if (colorMode === 'ups') {
       return orangeGradient(ratio)
     } else if (colorMode === 'sentiment') {
-      switch (REACTIONS[d.reaction ?? '']) {
+      const sentiment = REACTIONS[d.reaction ?? '']
+      if (selectedSentiments.length && !selectedSentiments.includes(sentiment)) {
+        return COLORS.lightGrey
+      }
+      switch (sentiment) {
         case 'positive':
-          return greenGradient(ratio)
+          return COLORS.green
         case 'neutral':
-          return neutralGradient(ratio)
+          return COLORS.grey
         case 'negative':
-          return redGradient(ratio)
+          return COLORS.red
         default:
           return defaultColor
       }
