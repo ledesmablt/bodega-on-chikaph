@@ -2,10 +2,11 @@
   import { onMount } from 'svelte'
   import scrollama from 'scrollama'
   import ChikaPosts from './ChikaPosts.svelte'
-  import type { ColorMode } from './_types'
+  import type { ColorMode, Sentiment } from './_types'
 
   let currentStep = $state<number | null>(null)
   let selectedPeople = $state<string[]>([])
+  let selectedSentiments = $state<Sentiment[]>([])
   let selectedPostId = $state<string | null>(null)
   let showOnlyTop10 = $state(true)
   let colorMode = $state<ColorMode>('ups')
@@ -16,37 +17,53 @@
     scroller
       .setup({
         step: 'section#posts-story .story-step',
-        offset: 0.5
+        offset: 0.7,
       })
       .onStepEnter(({ element, index }) => {
         currentStep = index
         const dataPeople = element.attributes.getNamedItem('data-selected-people')?.value
         const dataColorMode = element.attributes.getNamedItem('data-color-mode')?.value
         const dataSelectedPostId = element.attributes.getNamedItem('data-selected-post-id')?.value
+        const dataSelectedSentiment = element.attributes.getNamedItem('data-selected-sentiments')?.value
 
         if (currentStep === null) {
           return
         }
 
-        if (currentStep === 3) {
+        let resetForce = false
+        let shouldRedraw = false
+
+        if (currentStep >= 3) {
           // no turning back
+          if (showOnlyTop10) {
+            resetForce = true
+          }
           showOnlyTop10 = false
-          instance.drawSimulation({ resetForce: true })
+          shouldRedraw = true
         }
 
         if (typeof dataPeople === 'string') {
           selectedPeople = dataPeople.split(', ').filter(Boolean)
-          instance.drawSimulation()
+          shouldRedraw = true
         }
 
         if (typeof dataColorMode === 'string') {
           colorMode = dataColorMode as ColorMode
-          instance.drawSimulation()
+          shouldRedraw = true
         }
 
         if (typeof dataSelectedPostId === 'string') {
           selectedPostId = dataSelectedPostId
-          instance.drawSimulation()
+          shouldRedraw = true
+        }
+
+        if (typeof dataSelectedSentiment === 'string') {
+          selectedSentiments = dataSelectedSentiment.split(', ').filter(Boolean)
+          shouldRedraw = true
+        }
+
+        if (shouldRedraw) {
+          instance.drawSimulation({ resetForce })
         }
       })
   }
@@ -64,6 +81,7 @@
     bind:showOnlyTop10
     bind:colorMode
     bind:selectedPostId
+    bind:selectedSentiments
     bind:this={instance}
   />
 
@@ -161,6 +179,7 @@
     class="story-step storyblock with-spacer"
     data-selected-people=""
     data-color-mode="sentiment"
+    data-selected-sentiments=""
   >
     <p>
       <strong class="bg-green-500 px-1">Green</strong> circles are posts with mostly
@@ -177,19 +196,79 @@
     </p>
   </div>
 
-  <div class="story-step storyblock with-spacer">
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive">
     <p>
       To my surprise, most of the top posts on this gossip subreddit have positive reactions in the
       comments sections and the posts themselves.
     </p>
   </div>
 
-  <div class="story-step storyblock with-spacer">
-    <p>TODO: handpick highlighted posts for emotions</p>
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1jrc5ft">
+    <p>Of course, and everyone loves a good glow-up...</p>
+    <p>TODO: filter for glowup related posts?</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1l7vcq3">
+    <p>... and reddit is all ears for courtroom drama.</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1k6pq5g">
+    <p>To my surprise, not all headlines in ChikaPH are about celebrities politics - even Pope Francis made headlines around the time of his passing.</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1jwtvqy">
+    <p>Most heartwarming of all, it's nice to see the community expressing respect and support for people powering through difficult circumstances.</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1big0i4">
+    <p>There are moments when the community rallies together and cries for justice...</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1f9t7u0">
+    <p>... expresses disapproval and annoyance...</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1igf9m1">
+    <p>... grieves together...</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1dbkego">
+    <p>... or even just hates on the same influencers.</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1kxo4dd">
+    <p>Of course, <i>chika</i> means gossip, and the Filipino internet loves its scandals.</p>
+    <p>TODO: footnote on why "shocking" is tagged as neutral</p>
+    <p>TODO: filter for scandals</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="194h84i">
+    <p>We also love speculating on if a breakup is about to happen...</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="194tkza">
+    <p>... why it might happen...</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1clbysh">
+    <p>... or even if a new loveteam might be coming around.</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1l4yu8s">
+    <p>It was also amusing to see posts with more complex discussions - a [insert word count] word essay on BINI (and my <a rel="noreferrer" target="_blank" href="https://www.reddit.com/r/ChikaPH/comments/1l4yu8s/comment/mwdcaxh/">favorite comment</a> from this research)...</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1hzx3ml">
+    <p>... and people criticizing corporations' acts of generosity actually being "marketing tactics".</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="ups" data-selected-sentiments="" data-selected-post-id="">
+    <p>TODO: expose filter controls & let user play around</p>
   </div>
 
   <div class="story-step storyblock with-spacer">
-    <p>TODO: expose filter controls & let user play around</p>
+    <p>The breadth of topics in the ChikaPH subreddit extends beyond just gossip or celebrity news -- there's a lot going on, and it's </p>
+    <p>TODO: put this in conclusion?</p>
   </div>
 
   <div class="with-spacer"></div>
