@@ -1,7 +1,7 @@
-My preconceptions about the subreddit were wrong.
+I didn't have high expectations, but I'm pleasantly surprised by how much I enjoyed browsing ChikaPH.
 
-I would have expected it to be filled with too much negativity or shocking content for my liking.
-But it seems like people give just as much — perhaps even more — attention to celebrating
+My preconceptions of the subreddit were wrong; it's not all about shocking content.
+It seems like people give just as much — perhaps even more — attention to celebrating
 successes, supporting others, and just having a good time.
 
 It's interesting to examine pop culture obsession from a bird's eye view. Even more fun is getting into
