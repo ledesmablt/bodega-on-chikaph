@@ -124,7 +124,7 @@
   let openedPostId: string | null = $state(null)
   let openedPost = $derived(nodesById[openedPostId ?? ''])
 
-  export const drawContainer = ({ width }: { width?: number} = {}) => {
+  export const drawContainer = ({ width }: { width?: number } = {}) => {
     if (!width) {
       width = containerWidth
     }
@@ -386,16 +386,16 @@
   }
 
   // resizing mumbo jumbo that chatgpt gave me
-  let el: any; // reference to the element
-  let width = 0;
-  let observer: any;
+  let el: any // reference to the element
+  let width = 0
+  let observer: any
 
   function handleResize(entries: any[]) {
     for (const entry of entries) {
-      const newWidth = entry.contentRect.width;
+      const newWidth = entry.contentRect.width
       if (newWidth !== width) {
-        width = newWidth;
-        onWidthChange(width);
+        width = newWidth
+        onWidthChange(width)
       }
     }
   }
@@ -406,11 +406,10 @@
     drawSimulation({ resetForce: true })
   }
 
-
   onMount(() => {
     // part of the resizing mumbo jumbo
-    observer = new ResizeObserver(handleResize);
-    if (el) observer.observe(el);
+    observer = new ResizeObserver(handleResize)
+    if (el) observer.observe(el)
 
     d3.json('/data/2025/redditchika/chika_10.json')
       .then((data) => {
@@ -422,13 +421,13 @@
   })
 
   onDestroy(() => {
-    if (observer) observer.disconnect();
-  });
+    if (observer) observer.disconnect()
+  })
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
-  class="sticky top-1/2 w-full lg:min-w-[1024px] transform-[translateY(-50%)]"
+  class="sticky top-1/2 w-full transform-[translateY(-50%)] lg:min-w-[1024px]"
   bind:this={el}
   onclick={(e) => {
     const target = e.target as SVGElement | HTMLElement
@@ -449,7 +448,15 @@
       >
         <div class="flex flex-col gap-2">
           <div id="select-colormode-wrapper">
-            <select name="select-colormode" bind:value={colorMode} class="w-full rounded px-1">
+            <select
+              name="select-colormode"
+              value={colorMode}
+              onchange={(e) => {
+                colorMode = e.currentTarget.value
+                drawSimulation()
+              }}
+              class="w-full rounded px-1"
+            >
               <option value="ups">color by upvotes</option>
               <option value="sentiment">color by sentiment</option>
             </select>
