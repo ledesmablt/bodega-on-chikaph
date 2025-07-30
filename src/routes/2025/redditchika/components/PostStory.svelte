@@ -97,6 +97,7 @@
   />
 
   <div class="story-step storyblock with-spacer" data-selected-people="">
+    <!-- TODO: move this to a more discreet message? -->
     <p>
       Posts with more upvotes appear as larger and darker circles, while posts with fewer upvotes
       are smaller & lighter.
@@ -110,8 +111,8 @@
   >
     <p>
       The most upvoted post of all-time on the subreddit has people celebrating the recent brand
-      deals and successes of <strong>Christopher Diwata</strong>, AKA “what haffen vella?” and
-      “Taylor Laughter.”
+      deals and successes of <strong>Christopher Diwata</strong>, made popular by the meme “what
+      haffen vella?”.
     </p>
   </div>
 
@@ -123,8 +124,7 @@
     <p>
       The <strong>Anthony & Maris</strong> issue last year also made huge waves—at the time it felt like
       everyone was glued to their screens waiting for the next update, spilling new info and tea over
-      dinner catchups and Christmas parties. (Friends would also browse through polarizing comments on
-      the posts and give their own takes.)
+      parties and dinner catchups.
     </p>
   </div>
 
@@ -134,8 +134,8 @@
       certain people or topics over others?
     </p>
     <p>
-      Looking into the <strong>top 10 posts per month</strong> gives us a much larger sample size to
-      work with.
+      Looking into the <strong>top 10 posts per month</strong>, we'll have more data to work with
+      and it might give us a better idea.
     </p>
   </div>
 
@@ -146,8 +146,7 @@
   >
     <p>Who's talked about the most often?</p>
     <p>
-      <strong>Christopher Diwata</strong> and <strong>Anthony & Maris</strong> are mentioned a fair bit
-      in the hottest posts...
+      <strong>Christopher Diwata</strong> and <strong>Anthony & Maris</strong> are mentioned a fair bit.
     </p>
   </div>
 
@@ -244,7 +243,7 @@
     data-selected-post-id="1k6pq5g"
   >
     <p>
-      To my surprise, not all headlines in ChikaPH are about celebrities politics - even Pope
+      To my surprise, not all headlines in ChikaPH are about celebrities and politics — even Pope
       Francis made headlines around the time of his passing.
     </p>
   </div>
@@ -256,8 +255,8 @@
     data-selected-post-id="1jwtvqy"
   >
     <p>
-      Most heartwarming of all, it's nice to see the community expressing respect and support for
-      people powering through difficult circumstances.
+      It's also nice to see the community expressing respect and support for people powering through
+      difficult circumstances.
     </p>
   </div>
 
@@ -321,18 +320,10 @@
     class="story-step storyblock with-spacer"
     data-color-mode="sentiment"
     data-selected-sentiments="neutral"
-    data-selected-post-id="194tkza"
-  >
-    <p>... why it might happen...</p>
-  </div>
-
-  <div
-    class="story-step storyblock with-spacer"
-    data-color-mode="sentiment"
-    data-selected-sentiments="neutral"
     data-selected-post-id="1clbysh"
   >
     <p>... or even if a new loveteam might be coming around.</p>
+    <p>TODO: filter for speculation</p>
   </div>
 
   <div
@@ -340,42 +331,17 @@
     data-color-mode="sentiment"
     data-selected-sentiments="neutral"
     data-selected-post-id="1l4yu8s"
+    data-show-filters="false"
   >
     <p>
-      It was also amusing to see posts with more complex discussions - a [insert word count] word
-      essay on BINI (and my <a
+      It was also amusing to see posts with more complex discussions — a 4000-word essay on BINI
+      (and my <a
         rel="noreferrer"
         target="_blank"
         href="https://www.reddit.com/r/ChikaPH/comments/1l4yu8s/comment/mwdcaxh/"
         >favorite comment</a
-      > from this research)...
+      > from this research).
     </p>
-  </div>
-
-  <div
-    class="story-step storyblock with-spacer"
-    data-color-mode="sentiment"
-    data-selected-sentiments="neutral"
-    data-selected-post-id="1hzx3ml"
-  >
-    <p>
-      ... and people criticizing corporations' acts of generosity actually being "marketing
-      tactics".
-    </p>
-  </div>
-
-  <div
-    class="story-step storyblock with-spacer"
-    data-color-mode="ups"
-    data-selected-sentiments=""
-    data-selected-post-id=""
-    data-show-filters="false"
-  >
-    <p>
-      The breadth of topics in the ChikaPH subreddit extends beyond just gossip or celebrity news --
-      there's a lot going on, and it's
-    </p>
-    <p>TODO: put this in conclusion?</p>
   </div>
 
   <div
@@ -385,7 +351,7 @@
     data-selected-post-id=""
     data-show-filters="true"
   >
-    <p>TODO: expose filter controls & let user play around</p>
+    <p>Use the filters below to interact with the dataset and see what posts are mentioned.</p>
   </div>
 
   <div class="with-spacer"></div>

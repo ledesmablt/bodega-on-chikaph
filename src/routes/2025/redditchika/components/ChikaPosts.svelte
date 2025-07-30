@@ -5,6 +5,7 @@
   import _ from 'lodash'
   import { RefreshCw } from 'lucide-svelte'
   import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
+  import { fade } from 'svelte/transition'
 
   let {
     selectedPeople = $bindable<string[]>([]),
@@ -13,7 +14,7 @@
     selectedSentiments = $bindable<Sentiment[]>([]),
     hoveredPostId = $bindable<string | null>(null),
     selectedPostId = $bindable<string | null>(),
-    showFilters = $bindable(false),
+    showFilters = $bindable(false)
   } = $props()
 
   const COLORS = {
@@ -75,10 +76,12 @@
     if (colorMode === 'ups') {
       return orangeGradient(ratio)
     } else if (colorMode === 'sentiment') {
-      if (selectedSentiments.length && !selectedSentiments.includes(d.reaction)) {
+      const sentiment = REACTIONS[d.reaction ?? '']
+      const matchesReaction = selectedSentiments.includes(d.reaction)
+      const matchesSentiment = selectedSentiments.includes(sentiment)
+      if (selectedSentiments.length && !(matchesReaction || matchesSentiment)) {
         return COLORS.lightGray
       }
-      const sentiment = REACTIONS[d.reaction ?? '']
       switch (sentiment) {
         case 'positive':
           return COLORS.green
@@ -393,76 +396,78 @@
   </div>
   <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
 
-  {#if showFilters}
-    <div id="active-filters" class="mt-2 flex items-start justify-center gap-2 h-[88px]">
-      <button
-        id="toggle-color-mode"
-        aria-label="reset filters"
-        class="text-gray-500"
-        onclick={onResetFilters}
+  <div class="mt-2 h-[96px]">
+    {#if showFilters}
+      <div
+        id="active-filters"
+        class="mt-2 flex items-start justify-center gap-2"
+        transition:fade={{ duration: 200 }}
       >
-        <RefreshCw />
-      </button>
-      <div class="flex flex-col gap-2">
-        <div id="select-colormode-wrapper">
-          <select name="select-colormode" bind:value={colorMode} class="w-full rounded px-1">
-            <option value="ups">color by upvotes</option>
-            <option value="sentiment">color by sentiment</option>
-          </select>
-        </div>
-        <div id="select-person-wrapper">
-          <select
-            name="select-person"
-            class={{
-              rounded: true,
-              'w-full': true,
-              'px-1': true,
-              'text-gray-500': !selectedPeople.length,
-              [`border`]: !!selectedPeople.length,
-              [`border-[#ff4500]`]: !!selectedPeople.length
-            }}
-            value={selectedPeople[0] ?? ''}
-            onchange={(e) => {
-              onChangeSelectedPeople(e.currentTarget.value)
-            }}
-          >
-            <option value="">(filter by subject)</option>
-            <!-- TODO: limit to top 20, show # of ups  -->
-            {#each peopleOptions as option}
-              <option value={option}>{option}</option>
-            {/each}
-          </select>
-        </div>
-        <div id="select-sentiment-wrapper" class={{ hidden: colorMode !== 'sentiment' }}>
-          <select
-            name="select-sentiment"
-            value={selectedSentiments[0] ?? ''}
-            class={{
-              'w-full': true,
-              rounded: true,
-              'px-1': true,
-              'bg-green-500': REACTIONS[selectedSentiments[0]] === 'positive',
-              'bg-gray-400': REACTIONS[selectedSentiments[0]] === 'neutral',
-              'bg-red-500': REACTIONS[selectedSentiments[0]] === 'negative',
-              'text-gray-500': !selectedSentiments.length
-            }}
-            onchange={(e) => {
-              onChangeSelectedSentiments(e.currentTarget.value)
-            }}
-          >
-            <option value="">(filter by sentiment)</option>
-            {#each Object.entries(REACTIONS) as [key]}
-              <option value={key}>{key}</option>
-            {/each}
-          </select>
+        <button
+          id="toggle-color-mode"
+          aria-label="reset filters"
+          class="text-gray-500"
+          onclick={onResetFilters}
+        >
+          <RefreshCw />
+        </button>
+        <div class="flex flex-col gap-2">
+          <div id="select-colormode-wrapper">
+            <select name="select-colormode" bind:value={colorMode} class="w-full rounded px-1">
+              <option value="ups">color by upvotes</option>
+              <option value="sentiment">color by sentiment</option>
+            </select>
+          </div>
+          <div id="select-person-wrapper">
+            <select
+              name="select-person"
+              class={{
+                rounded: true,
+                'w-full': true,
+                'px-1': true,
+                'text-gray-500': !selectedPeople.length,
+                [`border`]: !!selectedPeople.length,
+                [`border-[#ff4500]`]: !!selectedPeople.length
+              }}
+              value={selectedPeople[0] ?? ''}
+              onchange={(e) => {
+                onChangeSelectedPeople(e.currentTarget.value)
+              }}
+            >
+              <option value="">(filter by subject)</option>
+              <!-- TODO: limit to top 20, show # of ups  -->
+              {#each peopleOptions as option}
+                <option value={option}>{option}</option>
+              {/each}
+            </select>
+          </div>
+          <div id="select-sentiment-wrapper" class={{ hidden: colorMode !== 'sentiment' }}>
+            <select
+              name="select-sentiment"
+              value={selectedSentiments[0] ?? ''}
+              class={{
+                'w-full': true,
+                rounded: true,
+                'px-1': true,
+                'bg-green-500': REACTIONS[selectedSentiments[0]] === 'positive',
+                'bg-gray-400': REACTIONS[selectedSentiments[0]] === 'neutral',
+                'bg-red-500': REACTIONS[selectedSentiments[0]] === 'negative',
+                'text-gray-500': !selectedSentiments.length
+              }}
+              onchange={(e) => {
+                onChangeSelectedSentiments(e.currentTarget.value)
+              }}
+            >
+              <option value="">(filter by sentiment)</option>
+              {#each Object.entries(REACTIONS) as [key]}
+                <option value={key}>{key}</option>
+              {/each}
+            </select>
+          </div>
         </div>
       </div>
-    </div>
-  {:else}
-    <!-- NOTE: prevent layout shift by setting "default visible" element -->
-    <div style:height='96px'></div>
-  {/if}
-
+    {/if}
+  </div>
 
   {#if selectedPost}
     <button id="post-preview" onclick={() => onOpenDialog(selectedPost)}>
