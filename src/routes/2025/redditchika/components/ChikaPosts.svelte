@@ -5,11 +5,12 @@
   import _ from 'lodash'
   import { RefreshCw } from 'lucide-svelte'
   import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
-  import { fade } from 'svelte/transition'
+  import { fade, fly } from 'svelte/transition'
+  import { cubicOut } from 'svelte/easing'
 
   let {
     selectedPeople = $bindable<string[]>([]),
-    showOnlyTop10 = $bindable(true),
+    showTopRank = $bindable(1),
     colorMode = $bindable<ColorMode>('ups'),
     selectedSentiments = $bindable<Sentiment[]>([]),
     hoveredPostId = $bindable<string | null>(null),
@@ -58,7 +59,10 @@
   // TODO: limit this to top
   const peopleOptions = $derived(new Set(chikaPosts.flatMap((post) => post.people ?? [])))
   const maxUps = 11507
-  const minUps = $derived(showOnlyTop10 ? 5000 : 1579)
+
+  const RANK_THRESHOLD = 30
+  const showOnlyTop = $derived(showTopRank <= RANK_THRESHOLD)
+  const minUps = $derived(showOnlyTop ? 5000 : 1579)
   const radiusScale = $derived(d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR]))
 
   let simulation: d3.Simulation<any, any> | null = $state(null)
@@ -99,22 +103,15 @@
 
   const getNodes = (): SimulationNode[] => {
     const simNodes = simulation?.nodes()
-    const stillTop10 = simNodes?.length === 10
-    if (!showOnlyTop10 && stillTop10) {
-      return chikaPosts.map((node) => ({
-        ...node,
-        radius: radiusScale(node.ups)
-      }))
-    }
-
-    if (!simNodes) {
-      // article starts with showOnlyTop10
+    console.log(simNodes?.length, showTopRank)
+    if (simNodes?.length !== showTopRank) {
       return chikaPosts
-        .filter((node) => node.overall_rank <= 10)
+        .filter((node) => node.overall_rank <= showTopRank)
         .map((node) => ({
           ...node,
           radius: radiusScale(node.ups)
         }))
+        .sort((b, a) => b.overall_rank - a.overall_rank)
     }
 
     // default to using the simulation nodes, which already have position & vector
@@ -190,9 +187,48 @@
     const circles = g
       .selectChildren('circle')
       .data(nodes, (d) => (d as ChikaPost).id)
-      .join('circle')
+      .join(
+        (enter) => {
+          const circle = enter.append('circle').attr('r', 0)
+
+          const getDuration = (d: SimulationNode) => {
+            if (d.overall_rank === 1) {
+              return 500
+            }
+            if (d.overall_rank <= RANK_THRESHOLD) {
+              return 200
+            }
+            return 150
+          }
+
+          const getDelay = (d: SimulationNode) => {
+            if (d.overall_rank === 1) {
+              return 0
+            }
+            if (d.overall_rank <= RANK_THRESHOLD) {
+              return d.overall_rank * 20 + 1000
+            }
+            return d.overall_rank * 5
+          }
+
+          circle
+            .transition()
+            .duration((d) => getDuration(d))
+            .delay((d) => getDelay(d))
+            .attr('r', (d) => d.radius)
+
+          return circle
+        },
+        (update) => {
+          update
+            .attr('r', (d) => d.radius)
+            .transition()
+            .duration(100)
+          return update
+        },
+        (exit) => exit
+      )
       .classed('top-10-item', true)
-      .attr('r', (d) => d.radius)
       .attr('fill', (d) => getFill(d))
 
     const onSimulationTick = () => {
@@ -255,10 +291,10 @@
 
       if (opts.resetForce) {
         simulation
-          // draw the top 10 circles together faster.
+          // draw the top circles together faster.
           // calling #force again will "reset" the "charge", causing the
           // circles to move towards the center.
-          .force('charge', d3.forceManyBody().strength(nodes.length === 10 ? 50 : 1))
+          .force('charge', d3.forceManyBody().strength(nodes.length <= RANK_THRESHOLD ? 10 : 1))
       }
 
       // actually restart the simulation
@@ -271,11 +307,16 @@
       }
       if (opts.resetForce) {
         return 1
-      } else {
-        // we want to use the ongoing simulation's alpha when appropriate so we don't
-        // "reheat" the simulation over and over.
-        return simulation.alpha()
       }
+      const currentAlpha = simulation.alpha()
+      if (currentAlpha <= simulation.alphaMin()) {
+        // "reheat" the simulation when it stops so that drifters find their place
+        return 0.2
+      }
+
+      // we want to use the ongoing simulation's alpha when appropriate so we don't
+      // "reheat" the simulation too early.
+      return currentAlpha
     }
 
     simulation = d3
@@ -316,25 +357,11 @@
     dialog.close()
   }
 
-  const toggleColorMode = () => {
-    if (colorMode === 'ups') {
-      colorMode = 'sentiment'
-    } else {
-      colorMode = 'ups'
-    }
-    drawSimulation()
-  }
-
   const onResetFilters = () => {
     colorMode = 'ups'
     selectedPeople = []
     selectedSentiments = []
     drawSimulation()
-  }
-
-  const toggleShowAllPosts = () => {
-    showOnlyTop10 = !showOnlyTop10
-    drawSimulation({ resetForce: true })
   }
 
   const onChangeSelectedPeople = (value: string) => {
@@ -378,22 +405,6 @@
     }
   }}
 >
-  <div id="controls" class="hidden">
-    <button
-      id="toggle-top10"
-      class="border-gray cursor-pointer rounded border p-2"
-      onclick={toggleShowAllPosts}
-    >
-      {#if showOnlyTop10}
-        show all posts
-      {:else}
-        show top 10 posts
-      {/if}
-    </button>
-    <button class="border-gray cursor-pointer rounded border p-2" onclick={toggleColorMode}>
-      color by {colorMode === 'ups' ? 'ups' : 'sentiment'}
-    </button>
-  </div>
   <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
 
   <div class="mt-2 h-[96px]">
@@ -441,7 +452,7 @@
               {/each}
             </select>
           </div>
-          <div id="select-sentiment-wrapper" class={{ hidden: colorMode !== 'sentiment' }}>
+          <div id="select-sentiment-wrapper">
             <select
               name="select-sentiment"
               value={selectedSentiments[0] ?? ''}
@@ -470,7 +481,12 @@
   </div>
 
   {#if selectedPost}
-    <button id="post-preview" onclick={() => onOpenDialog(selectedPost)}>
+    <button
+      id="post-preview"
+      onclick={() => onOpenDialog(selectedPost)}
+      in:fly={{ duration: 200, easing: cubicOut, y: 50 }}
+      out:fade={{ duration: 150 }}
+    >
       <p class="line-clamp-1">{selectedPost.title}</p>
       {#if selectedPost.people.length > 0}
         <p class="line-clamp-1">Subject: {selectedPost.people.join(', ')}</p>

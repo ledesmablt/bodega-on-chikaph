@@ -8,7 +8,7 @@
   let selectedPeople = $state<string[]>([])
   let selectedSentiments = $state<Sentiment[]>([])
   let selectedPostId = $state<string | null>(null)
-  let showOnlyTop10 = $state(true)
+  let showTopRank = $state(0)
   let colorMode = $state<ColorMode>('ups')
   let showFilters = $state(false)
   let instance = $state<any>()
@@ -22,6 +22,7 @@
       })
       .onStepEnter(({ element, index }) => {
         currentStep = index
+        const dataShowTop = Number(element.attributes.getNamedItem('data-show-top')?.value)
         const dataPeople = element.attributes.getNamedItem('data-selected-people')?.value
         const dataColorMode = element.attributes.getNamedItem('data-color-mode')?.value
         const dataSelectedPostId = element.attributes.getNamedItem('data-selected-post-id')?.value
@@ -37,12 +38,11 @@
         let resetForce = false
         let shouldRedraw = false
 
-        if (currentStep >= 3) {
-          // no turning back
-          if (showOnlyTop10) {
+        if (!isNaN(dataShowTop)) {
+          if (showTopRank !== dataShowTop) {
             resetForce = true
           }
-          showOnlyTop10 = false
+          showTopRank = Math.max(dataShowTop, showTopRank)
           shouldRedraw = true
         }
 
@@ -84,11 +84,11 @@
 </script>
 
 <section id="posts-story" class="flex w-full max-w-screen flex-col items-center">
-  <div class="h-[40vh]"></div>
+  <div class="h-120"></div>
 
   <ChikaPosts
     bind:selectedPeople
-    bind:showOnlyTop10
+    bind:showTopRank
     bind:colorMode
     bind:selectedPostId
     bind:selectedSentiments
@@ -96,7 +96,7 @@
     bind:this={instance}
   />
 
-  <div class="story-step storyblock with-spacer" data-selected-people="">
+  <div class="story-step storyblock with-spacer" data-selected-people="" data-show-top="30">
     <!-- TODO: move this to a more discreet message? -->
     <p>
       Posts with more upvotes appear as larger and darker circles, while posts with fewer upvotes
@@ -116,10 +116,12 @@
     </p>
   </div>
 
+  <!-- TODO: animate showing more & more circles? -->
   <div
     class="story-step storyblock with-spacer"
     data-selected-people="Maris Racal, Anthony Jennings"
     data-selected-post-id="1h5ofsd"
+    data-show-top="30"
   >
     <p>
       The <strong>Anthony & Maris</strong> issue last year also made huge waves—at the time it felt like
@@ -128,7 +130,12 @@
     </p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-selected-people="" data-selected-post-id="">
+  <div
+    class="story-step storyblock with-spacer"
+    data-selected-people=""
+    data-selected-post-id=""
+    data-show-top="180"
+  >
     <p>
       Is there more to ChikaPH than celebrities and politics? Does the sub tend to talk about
       certain people or topics over others?
@@ -223,7 +230,7 @@
     data-selected-sentiments="positive"
     data-selected-post-id="1jrc5ft"
   >
-    <p>Of course, and everyone loves a good glow-up...</p>
+    <p>Everyone loves a good glow-up...</p>
     <p>TODO: filter for glowup related posts?</p>
   </div>
 
