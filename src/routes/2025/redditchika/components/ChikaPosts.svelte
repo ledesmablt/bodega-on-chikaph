@@ -3,6 +3,7 @@
   import { marked } from 'marked'
   import * as d3 from 'd3'
   import _ from 'lodash'
+  import { RefreshCw } from 'lucide-svelte'
   import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
 
   let {
@@ -12,23 +13,24 @@
     selectedSentiments = $bindable<Sentiment[]>([]),
     hoveredPostId = $bindable<string | null>(null),
     selectedPostId = $bindable<string | null>(),
+    showFilters = $bindable(false),
   } = $props()
 
   const COLORS = {
     black: 'black',
-    lightGrey: '#e5e7eb',
+    lightGray: '#e5e7eb',
     lightOrange: '#fcdacc',
     darkOrange: '#ff4500',
     green: '#22c55e',
     red: '#f87171',
-    grey: '#6b7280',
+    gray: '#6b7280'
   } as const
 
   // TODO: plug this into the tailwind theme
   const MIN_VW = 390
   const MAX_VW = 640
   const vwDomain = [MIN_VW, MAX_VW]
-  let mouse = $state([0,0])
+  let mouse = $state([0, 0])
   let containerWidth = $state(MAX_VW)
   let containerHeight = $derived(containerWidth)
   const minCircleScale = d3.scaleLinear(vwDomain, [5, 8]).clamp(true)
@@ -42,7 +44,6 @@
     happy: 'positive',
     funny: 'positive',
     supportive: 'positive',
-    dasurb: 'neutral',
     shocking: 'neutral',
     interesting: 'neutral',
     neutral: 'neutral',
@@ -53,6 +54,8 @@
   }
 
   let chikaPosts = $state<ChikaPost[]>([])
+  // TODO: limit this to top
+  const peopleOptions = $derived(new Set(chikaPosts.flatMap((post) => post.people ?? [])))
   const maxUps = 11507
   const minUps = $derived(showOnlyTop10 ? 5000 : 1579)
   const radiusScale = $derived(d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR]))
@@ -65,22 +68,22 @@
 
     const hasPeopleOverlap = _.intersection(d.people, selectedPeople).length == 0
     if (selectedPeople.length > 0 && hasPeopleOverlap) {
-      // color only selected people, otherwise grey the rest out
-      return COLORS.lightGrey
+      // color only selected people, otherwise gray the rest out
+      return COLORS.lightGray
     }
 
     if (colorMode === 'ups') {
       return orangeGradient(ratio)
     } else if (colorMode === 'sentiment') {
-      const sentiment = REACTIONS[d.reaction ?? '']
-      if (selectedSentiments.length && !selectedSentiments.includes(sentiment)) {
-        return COLORS.lightGrey
+      if (selectedSentiments.length && !selectedSentiments.includes(d.reaction)) {
+        return COLORS.lightGray
       }
+      const sentiment = REACTIONS[d.reaction ?? '']
       switch (sentiment) {
         case 'positive':
           return COLORS.green
         case 'neutral':
-          return COLORS.grey
+          return COLORS.gray
         case 'negative':
           return COLORS.red
         default:
@@ -226,7 +229,7 @@
           onReheatSimulation({ resetForce: true })
         })
         .on('mousemove', (e) => {
-            mouse = d3.pointer(e)
+          mouse = d3.pointer(e)
         })
 
       // draw this on every tick so that the preview shifts with the node's position
@@ -319,9 +322,34 @@
     drawSimulation()
   }
 
+  const onResetFilters = () => {
+    colorMode = 'ups'
+    selectedPeople = []
+    selectedSentiments = []
+    drawSimulation()
+  }
+
   const toggleShowAllPosts = () => {
     showOnlyTop10 = !showOnlyTop10
     drawSimulation({ resetForce: true })
+  }
+
+  const onChangeSelectedPeople = (value: string) => {
+    if (value) {
+      selectedPeople = [value]
+    } else {
+      selectedPeople = []
+    }
+    drawSimulation()
+  }
+
+  const onChangeSelectedSentiments = (value: string) => {
+    if (value) {
+      selectedSentiments = [value]
+    } else {
+      selectedSentiments = []
+    }
+    drawSimulation()
   }
 
   onMount(() => {
@@ -364,9 +392,77 @@
     </button>
   </div>
   <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
-  <div id="active-filters" class="mt-2">
-    <p>TODO: expose filters here?</p>
-  </div>
+
+  {#if showFilters}
+    <div id="active-filters" class="mt-2 flex items-start justify-center gap-2 h-[88px]">
+      <button
+        id="toggle-color-mode"
+        aria-label="reset filters"
+        class="text-gray-500"
+        onclick={onResetFilters}
+      >
+        <RefreshCw />
+      </button>
+      <div class="flex flex-col gap-2">
+        <div id="select-colormode-wrapper">
+          <select name="select-colormode" bind:value={colorMode} class="w-full rounded px-1">
+            <option value="ups">color by upvotes</option>
+            <option value="sentiment">color by sentiment</option>
+          </select>
+        </div>
+        <div id="select-person-wrapper">
+          <select
+            name="select-person"
+            class={{
+              rounded: true,
+              'w-full': true,
+              'px-1': true,
+              'text-gray-500': !selectedPeople.length,
+              [`border`]: !!selectedPeople.length,
+              [`border-[#ff4500]`]: !!selectedPeople.length
+            }}
+            value={selectedPeople[0] ?? ''}
+            onchange={(e) => {
+              onChangeSelectedPeople(e.currentTarget.value)
+            }}
+          >
+            <option value="">(filter by subject)</option>
+            <!-- TODO: limit to top 20, show # of ups  -->
+            {#each peopleOptions as option}
+              <option value={option}>{option}</option>
+            {/each}
+          </select>
+        </div>
+        <div id="select-sentiment-wrapper" class={{ hidden: colorMode !== 'sentiment' }}>
+          <select
+            name="select-sentiment"
+            value={selectedSentiments[0] ?? ''}
+            class={{
+              'w-full': true,
+              rounded: true,
+              'px-1': true,
+              'bg-green-500': REACTIONS[selectedSentiments[0]] === 'positive',
+              'bg-gray-400': REACTIONS[selectedSentiments[0]] === 'neutral',
+              'bg-red-500': REACTIONS[selectedSentiments[0]] === 'negative',
+              'text-gray-500': !selectedSentiments.length
+            }}
+            onchange={(e) => {
+              onChangeSelectedSentiments(e.currentTarget.value)
+            }}
+          >
+            <option value="">(filter by sentiment)</option>
+            {#each Object.entries(REACTIONS) as [key]}
+              <option value={key}>{key}</option>
+            {/each}
+          </select>
+        </div>
+      </div>
+    </div>
+  {:else}
+    <!-- NOTE: prevent layout shift by setting "default visible" element -->
+    <div style:height='96px'></div>
+  {/if}
+
 
   {#if selectedPost}
     <button id="post-preview" onclick={() => onOpenDialog(selectedPost)}>
@@ -439,6 +535,12 @@
     position: fixed;
     text-align: left;
     cursor: pointer;
+  }
+
+  #active-filters {
+    button {
+      cursor: pointer;
+    }
   }
 
   :global {

@@ -10,6 +10,7 @@
   let selectedPostId = $state<string | null>(null)
   let showOnlyTop10 = $state(true)
   let colorMode = $state<ColorMode>('ups')
+  let showFilters = $state(false)
   let instance = $state<any>()
 
   const setupScrolly = () => {
@@ -25,6 +26,7 @@
         const dataColorMode = element.attributes.getNamedItem('data-color-mode')?.value
         const dataSelectedPostId = element.attributes.getNamedItem('data-selected-post-id')?.value
         const dataSelectedSentiment = element.attributes.getNamedItem('data-selected-sentiments')?.value
+        const dataShowFilters = element.attributes.getNamedItem('data-show-filters')?.value
 
         if (currentStep === null) {
           return
@@ -58,8 +60,14 @@
         }
 
         if (typeof dataSelectedSentiment === 'string') {
-          selectedSentiments = dataSelectedSentiment.split(', ').filter(Boolean)
+          selectedSentiments = dataSelectedSentiment.split(', ').filter(Boolean) as Sentiment[]
           shouldRedraw = true
+        }
+
+        if (dataShowFilters === 'true') {
+          showFilters = true
+        } else if (dataShowFilters === 'false') {
+          showFilters = false
         }
 
         if (shouldRedraw) {
@@ -82,6 +90,7 @@
     bind:colorMode
     bind:selectedPostId
     bind:selectedSentiments
+    bind:showFilters
     bind:this={instance}
   />
 
@@ -262,13 +271,13 @@
     <p>... and people criticizing corporations' acts of generosity actually being "marketing tactics".</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="ups" data-selected-sentiments="" data-selected-post-id="">
-    <p>TODO: expose filter controls & let user play around</p>
-  </div>
-
-  <div class="story-step storyblock with-spacer">
+  <div class="story-step storyblock with-spacer" data-color-mode="ups" data-selected-sentiments="" data-selected-post-id="" data-show-filters="false">
     <p>The breadth of topics in the ChikaPH subreddit extends beyond just gossip or celebrity news -- there's a lot going on, and it's </p>
     <p>TODO: put this in conclusion?</p>
+  </div>
+
+  <div class="story-step storyblock with-spacer" data-color-mode="ups" data-selected-sentiments="" data-selected-post-id="" data-show-filters="true">
+    <p>TODO: expose filter controls & let user play around</p>
   </div>
 
   <div class="with-spacer"></div>
