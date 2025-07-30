@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import { marked } from 'marked'
   import * as d3 from 'd3'
   import _ from 'lodash'
-  import { RefreshCw } from 'lucide-svelte'
   import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
   import { fade, fly } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
@@ -29,14 +28,15 @@
   } as const
 
   // TODO: plug this into the tailwind theme
-  const MIN_VW = 390
-  const MAX_VW = 640
-  const vwDomain = [MIN_VW, MAX_VW]
+  const MIN_WIDTH = 390
+  const MAX_WIDTH = 1200
+  const MAX_HEIGHT = 680
   let mouse = $state([0, 0])
-  let containerWidth = $state(MAX_VW)
-  let containerHeight = $derived(containerWidth)
-  const minCircleScale = d3.scaleLinear(vwDomain, [5, 8]).clamp(true)
-  const maxCircleScale = d3.scaleLinear(vwDomain, [20, 40]).clamp(true)
+  let containerWidth = $state(390)
+  let containerHeight = $derived(Math.min(containerWidth + 80, MAX_HEIGHT))
+  const widthDomain = $derived([MIN_WIDTH, MAX_WIDTH])
+  const minCircleScale = $derived(d3.scaleLinear(widthDomain, [3, 8]).clamp(true))
+  const maxCircleScale = $derived(d3.scaleLinear(widthDomain, [22, 40]).clamp(true))
   const minCircleR = $derived(minCircleScale(containerWidth))
   const maxCircleR = $derived(maxCircleScale(containerWidth))
   const orangeGradient = d3.interpolateRgb(COLORS.lightOrange, COLORS.darkOrange)
@@ -124,14 +124,18 @@
   let openedPostId: string | null = $state(null)
   let openedPost = $derived(nodesById[openedPostId ?? ''])
 
-  export const drawContainer = () => {
+  export const drawContainer = ({ width }: { width?: number} = {}) => {
+    if (!width) {
+      width = containerWidth
+    }
+    console.log('drawContainer', width)
     const container = d3
       .select('#top-10-wrapper')
-      .attr('width', containerWidth)
+      .attr('width', width)
       .attr('height', containerHeight)
     return container
       .append('g')
-      .attr('width', containerWidth)
+      .attr('width', width)
       .attr('height', containerHeight)
       .attr('id', 'top-10-group')
   }
@@ -158,10 +162,16 @@
     post.style('height', `${boxHeight}px`)
     post.style('padding', '16px 24px')
 
-    const padding = 12
-    post.style('top', `${node.y + node.radius + padding}px`)
+    // if small screen, just center it
+    if (containerWidth <= 800) {
+      post.style('top', `${containerHeight - 20}px`)
+      post.style('left', `${containerWidth / 2 - boxWidth / 2}px`)
+      return
+    }
 
     // default left aligned
+    const padding = 12
+    post.style('top', `${node.y + node.radius + padding}px`)
     const withinRightBound = node.x + boxWidth <= containerWidth
     if (withinRightBound) {
       post.style('left', `${node.x}px`)
@@ -357,13 +367,6 @@
     dialog.close()
   }
 
-  const onResetFilters = () => {
-    colorMode = 'ups'
-    selectedPeople = []
-    selectedSentiments = []
-    drawSimulation()
-  }
-
   const onChangeSelectedPeople = (value: string) => {
     if (value) {
       selectedPeople = [value]
@@ -382,7 +385,33 @@
     drawSimulation()
   }
 
+  // resizing mumbo jumbo that chatgpt gave me
+  let el: any; // reference to the element
+  let width = 0;
+  let observer: any;
+
+  function handleResize(entries: any[]) {
+    for (const entry of entries) {
+      const newWidth = entry.contentRect.width;
+      if (newWidth !== width) {
+        width = newWidth;
+        onWidthChange(width);
+      }
+    }
+  }
+
+  function onWidthChange(newWidth: number) {
+    containerWidth = Math.min(newWidth, MAX_WIDTH)
+    drawContainer({ width: newWidth })
+    drawSimulation({ resetForce: true })
+  }
+
+
   onMount(() => {
+    // part of the resizing mumbo jumbo
+    observer = new ResizeObserver(handleResize);
+    if (el) observer.observe(el);
+
     d3.json('/data/2025/redditchika/chika_10.json')
       .then((data) => {
         chikaPosts = data as ChikaPost[]
@@ -391,12 +420,16 @@
       })
       .catch(console.error)
   })
+
+  onDestroy(() => {
+    if (observer) observer.disconnect();
+  });
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
-  class="sticky top-1/2 w-full transform-[translateY(-50%)]"
-  bind:clientWidth={containerWidth}
+  class="sticky top-1/2 w-full lg:min-w-[1024px] transform-[translateY(-50%)]"
+  bind:this={el}
   onclick={(e) => {
     const target = e.target as SVGElement | HTMLElement
     const className = target.getAttribute('class') ?? ''
@@ -405,7 +438,7 @@
     }
   }}
 >
-  <svg id="top-10-wrapper" class="z-1 mt-2 border border-gray-500"> </svg>
+  <svg id="top-10-wrapper" class="z-1"> </svg>
 
   <div class="mt-2 h-[96px]">
     {#if showFilters}
@@ -414,14 +447,6 @@
         class="mt-2 flex items-start justify-center gap-2"
         transition:fade={{ duration: 200 }}
       >
-        <button
-          id="toggle-color-mode"
-          aria-label="reset filters"
-          class="text-gray-500"
-          onclick={onResetFilters}
-        >
-          <RefreshCw />
-        </button>
         <div class="flex flex-col gap-2">
           <div id="select-colormode-wrapper">
             <select name="select-colormode" bind:value={colorMode} class="w-full rounded px-1">
@@ -437,8 +462,7 @@
                 'w-full': true,
                 'px-1': true,
                 'text-gray-500': !selectedPeople.length,
-                [`border`]: !!selectedPeople.length,
-                [`border-[#ff4500]`]: !!selectedPeople.length
+                [`bg-[#ff4500]`]: !!selectedPeople.length
               }}
               value={selectedPeople[0] ?? ''}
               onchange={(e) => {
@@ -556,12 +580,6 @@
     position: fixed;
     text-align: left;
     cursor: pointer;
-  }
-
-  #active-filters {
-    button {
-      cursor: pointer;
-    }
   }
 
   :global {

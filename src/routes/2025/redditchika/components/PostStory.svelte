@@ -312,8 +312,7 @@
     data-selected-post-id="1kxo4dd"
   >
     <p>
-      Of course, ChikaPH wouldn't be complete without the <i>chika</i> — especially around cheating
-      scandals.
+      Of course, ChikaPH wouldn't be complete without the <i>chika</i> — especially around scandals.
     </p>
     <p>TODO: footnote on why "shocking" is tagged as neutral</p>
     <p>TODO: filter for scandals</p>

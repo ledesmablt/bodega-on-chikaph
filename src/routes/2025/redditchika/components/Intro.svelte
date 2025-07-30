@@ -3,8 +3,8 @@
 </script>
 
 <div id="title" class="mt-10 mb-8 flex flex-col items-center text-center font-serif">
-  <h1 class="m-auto mb-4 text-3xl font-bold">understanding r/ChikaPH</h1>
-  <div class='italic font-light max-w-96'>
+  <h1 class="m-auto mb-4 text-3xl font-bold text-center max-w-80 md:max-w-none">about r/ChikaPH</h1>
+  <div class='italic font-light max-w-76 md:max-w-96'>
     <p>a glimpse into the Filipino pop culture psyche through one of the most popular communities on Reddit</p>
     <p class='mt-2'>by Benj Ledesma</p>
   </div>
