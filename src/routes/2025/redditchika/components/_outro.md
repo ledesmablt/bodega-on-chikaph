@@ -1,10 +1,16 @@
-I would have expected a gossip subreddit to be dominated by cheating scandals and the like,
-but seems like having a good time and celebrating others' successes attracts just as much,
-perhaps even more, attention.
+My preconceptions about the subreddit were wrong.
 
-It's interesting to see pop culture obsession in action — droves of comments with thousands of upvotes,
-witty comebacks and remarks, posts that rally people together or get polarized responses.
-While I’m just still way out of the loop with celebrity gossip,
-I’ve slowly come to appreciate the internet hivemind of r/ChikaPH.
+I would have expected it to be filled with too much negativity or shocking content for my liking.
+But it seems like people give just as much — perhaps even more — attention to celebrating
+successes, supporting others, and just having a good time.
 
-**TODO write the rest of the outro / conclusion!** Thanks for reading! :)
+It's interesting to examine pop culture obsession from a bird's eye view. Even more fun is getting into
+the weeds — reading investigative journalism-style posts with thousands of upvotes,
+watching people firefight and roast each other in the comments,
+seeing how topics can either rally people together or get polarized responses.
+
+Regardless of whatever might be trending on r/ChikaPH,
+I think I've come to appreciate it as a good place for light, entertaining browsing
+and seeing what people are talking about on the internet.
+
+(googles _"kathniel breakup explained reddit chikaph"_)

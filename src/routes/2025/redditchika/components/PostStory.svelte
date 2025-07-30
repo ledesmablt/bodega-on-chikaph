@@ -99,8 +99,10 @@
   <div class="story-step storyblock with-spacer" data-selected-people="" data-show-top="30">
     <!-- TODO: move this to a more discreet message? -->
     <p>
-      Posts with more upvotes appear as larger and darker circles, while posts with fewer upvotes
-      are smaller & lighter.
+      <i>
+        Posts with more upvotes appear as larger and darker circles, while posts with fewer upvotes
+        are smaller & lighter.
+      </i>
     </p>
   </div>
 
@@ -309,7 +311,10 @@
     data-selected-sentiments="neutral"
     data-selected-post-id="1kxo4dd"
   >
-    <p>Of course, <i>chika</i> means gossip, and the Filipino internet loves its scandals.</p>
+    <p>
+      Of course, ChikaPH wouldn't be complete without the <i>chika</i> — especially around cheating
+      scandals.
+    </p>
     <p>TODO: footnote on why "shocking" is tagged as neutral</p>
     <p>TODO: filter for scandals</p>
   </div>
@@ -320,7 +325,7 @@
     data-selected-sentiments="neutral"
     data-selected-post-id="194h84i"
   >
-    <p>We also love speculating on if a breakup is about to happen...</p>
+    <p>The sub also loves speculating on if a breakup is about to happen...</p>
   </div>
 
   <div
@@ -329,39 +334,42 @@
     data-selected-sentiments="neutral"
     data-selected-post-id="1clbysh"
   >
-    <p>... or even if a new loveteam might be coming around.</p>
+    <p>... or if a new loveteam might be coming around.</p>
     <p>TODO: filter for speculation</p>
   </div>
 
   <div
     class="story-step storyblock with-spacer"
     data-color-mode="sentiment"
+    data-selected-people=""
     data-selected-sentiments="neutral"
     data-selected-post-id="1l4yu8s"
     data-show-filters="false"
   >
     <p>
-      It was also amusing to see posts with more complex discussions — a 4000-word essay on BINI
-      (and my <a
+      It was also amusing to see posts with more complex discussions, like this 4000-word essay on
+      BINI (which also has my <a
         rel="noreferrer"
         target="_blank"
+        class="underline"
         href="https://www.reddit.com/r/ChikaPH/comments/1l4yu8s/comment/mwdcaxh/"
         >favorite comment</a
-      > from this research).
+      > from the sub).
     </p>
   </div>
 
   <div
     class="story-step storyblock with-spacer"
     data-color-mode="ups"
+    data-selected-people=""
     data-selected-sentiments=""
     data-selected-post-id=""
     data-show-filters="true"
   >
-    <p>Use the filters below to interact with the dataset and see what posts are mentioned.</p>
+    <p>
+      <i>Use the filters below to interact with the dataset.</i>
+    </p>
   </div>
-
-  <div class="with-spacer"></div>
 </section>
 
 <style>

@@ -6,5 +6,4 @@
   <div class="app-prose">
     <OutroText/>
   </div>
-  <div class="mt-20 text-center">TODO footer / nav</div>
 </section>
