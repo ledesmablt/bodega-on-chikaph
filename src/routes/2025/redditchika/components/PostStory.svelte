@@ -18,14 +18,16 @@
     scroller
       .setup({
         step: 'section#posts-story .story-step',
-        offset: 0.7,
+        offset: 0.7
       })
       .onStepEnter(({ element, index }) => {
         currentStep = index
         const dataPeople = element.attributes.getNamedItem('data-selected-people')?.value
         const dataColorMode = element.attributes.getNamedItem('data-color-mode')?.value
         const dataSelectedPostId = element.attributes.getNamedItem('data-selected-post-id')?.value
-        const dataSelectedSentiment = element.attributes.getNamedItem('data-selected-sentiments')?.value
+        const dataSelectedSentiment = element.attributes.getNamedItem(
+          'data-selected-sentiments'
+        )?.value
         const dataShowFilters = element.attributes.getNamedItem('data-show-filters')?.value
 
         if (currentStep === null) {
@@ -205,78 +207,184 @@
     </p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="positive"
+  >
     <p>
       To my surprise, most of the top posts on this gossip subreddit have positive reactions in the
       comments sections and the posts themselves.
     </p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1jrc5ft">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="positive"
+    data-selected-post-id="1jrc5ft"
+  >
     <p>Of course, and everyone loves a good glow-up...</p>
     <p>TODO: filter for glowup related posts?</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1l7vcq3">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="positive"
+    data-selected-post-id="1l7vcq3"
+  >
     <p>... and reddit is all ears for courtroom drama.</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1k6pq5g">
-    <p>To my surprise, not all headlines in ChikaPH are about celebrities politics - even Pope Francis made headlines around the time of his passing.</p>
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="positive"
+    data-selected-post-id="1k6pq5g"
+  >
+    <p>
+      To my surprise, not all headlines in ChikaPH are about celebrities politics - even Pope
+      Francis made headlines around the time of his passing.
+    </p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="positive" data-selected-post-id="1jwtvqy">
-    <p>Most heartwarming of all, it's nice to see the community expressing respect and support for people powering through difficult circumstances.</p>
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="positive"
+    data-selected-post-id="1jwtvqy"
+  >
+    <p>
+      Most heartwarming of all, it's nice to see the community expressing respect and support for
+      people powering through difficult circumstances.
+    </p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1big0i4">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="negative"
+    data-selected-post-id="1big0i4"
+  >
     <p>There are moments when the community rallies together and cries for justice...</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1f9t7u0">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="negative"
+    data-selected-post-id="1f9t7u0"
+  >
     <p>... expresses disapproval and annoyance...</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1igf9m1">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="negative"
+    data-selected-post-id="1igf9m1"
+  >
     <p>... grieves together...</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="negative" data-selected-post-id="1dbkego">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="negative"
+    data-selected-post-id="1dbkego"
+  >
     <p>... or even just hates on the same influencers.</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1kxo4dd">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="neutral"
+    data-selected-post-id="1kxo4dd"
+  >
     <p>Of course, <i>chika</i> means gossip, and the Filipino internet loves its scandals.</p>
     <p>TODO: footnote on why "shocking" is tagged as neutral</p>
     <p>TODO: filter for scandals</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="194h84i">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="neutral"
+    data-selected-post-id="194h84i"
+  >
     <p>We also love speculating on if a breakup is about to happen...</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="194tkza">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="neutral"
+    data-selected-post-id="194tkza"
+  >
     <p>... why it might happen...</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1clbysh">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="neutral"
+    data-selected-post-id="1clbysh"
+  >
     <p>... or even if a new loveteam might be coming around.</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1l4yu8s">
-    <p>It was also amusing to see posts with more complex discussions - a [insert word count] word essay on BINI (and my <a rel="noreferrer" target="_blank" href="https://www.reddit.com/r/ChikaPH/comments/1l4yu8s/comment/mwdcaxh/">favorite comment</a> from this research)...</p>
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="neutral"
+    data-selected-post-id="1l4yu8s"
+  >
+    <p>
+      It was also amusing to see posts with more complex discussions - a [insert word count] word
+      essay on BINI (and my <a
+        rel="noreferrer"
+        target="_blank"
+        href="https://www.reddit.com/r/ChikaPH/comments/1l4yu8s/comment/mwdcaxh/"
+        >favorite comment</a
+      > from this research)...
+    </p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="sentiment" data-selected-sentiments="neutral" data-selected-post-id="1hzx3ml">
-    <p>... and people criticizing corporations' acts of generosity actually being "marketing tactics".</p>
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="sentiment"
+    data-selected-sentiments="neutral"
+    data-selected-post-id="1hzx3ml"
+  >
+    <p>
+      ... and people criticizing corporations' acts of generosity actually being "marketing
+      tactics".
+    </p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="ups" data-selected-sentiments="" data-selected-post-id="" data-show-filters="false">
-    <p>The breadth of topics in the ChikaPH subreddit extends beyond just gossip or celebrity news -- there's a lot going on, and it's </p>
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="ups"
+    data-selected-sentiments=""
+    data-selected-post-id=""
+    data-show-filters="false"
+  >
+    <p>
+      The breadth of topics in the ChikaPH subreddit extends beyond just gossip or celebrity news --
+      there's a lot going on, and it's
+    </p>
     <p>TODO: put this in conclusion?</p>
   </div>
 
-  <div class="story-step storyblock with-spacer" data-color-mode="ups" data-selected-sentiments="" data-selected-post-id="" data-show-filters="true">
+  <div
+    class="story-step storyblock with-spacer"
+    data-color-mode="ups"
+    data-selected-sentiments=""
+    data-selected-post-id=""
+    data-show-filters="true"
+  >
     <p>TODO: expose filter controls & let user play around</p>
   </div>
 
