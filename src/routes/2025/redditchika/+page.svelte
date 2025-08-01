@@ -2,6 +2,7 @@
   import Intro from './components/Intro.svelte'
   import PostStory from './components/PostStory.svelte'
   import Outro from './components/Outro.svelte'
+  import Methodology from './components/Methodology.svelte'
 </script>
 
 {#if typeof window !== 'undefined'}
@@ -9,6 +10,8 @@
     <Intro />
     <PostStory />
     <Outro />
+    <div class="text-center my-20">~~~</div>
+    <Methodology/>
   </article>
 {/if}
 
@@ -22,14 +25,23 @@
       /* --font-sans: IBM Plex Sans; */
       --font-sans: Reddit Sans;
       --font-mono: IBM Plex Mono;
+      --color-theme-dark-orange: #ff4500;
+      --color-theme-light-orange: #fcdacc;
 
       width: 100%;
       max-width: 640px;
       margin: 0 auto;
+      margin-bottom: 64px;
       font-family: Reddit Sans;
+      color: var(--color-gray-700);
 
       ::selection {
         background: #fcdacc;
+      }
+
+      a {
+        text-decoration: underline;
+        text-decoration-color: var(--color-theme-dark-orange);
       }
 
       .app-prose {
@@ -42,8 +54,7 @@
         p {
           margin: 12px 0;
           font-size: 16px;
-          line-height: 28px;
-          color: var(--color-gray-700);
+          line-height: 1.75;
         }
       }
     }

@@ -381,7 +381,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    line-height: 24px;
+    line-height: 1.5;
   }
 
   .with-spacer {
