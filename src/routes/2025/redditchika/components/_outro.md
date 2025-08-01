@@ -13,4 +13,4 @@ Regardless of whatever might be trending on r/ChikaPH,
 I think I've come to appreciate it as a good place for light, entertaining browsing
 and seeing what people are talking about on the internet.
 
-(googles _"kathniel breakup explained reddit chikaph"_)
+(googles _"kathden loveteam explained reddit chikaph"_)

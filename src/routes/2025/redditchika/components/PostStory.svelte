@@ -213,6 +213,7 @@
       <strong class="bg-gray-700 px-1">mixed or ambiguous</strong> reactions like feeling shocked or
       simply interested.
     </p>
+    <p class="mt-2 text-sm"><i>For more details, see <a href="#methodology">methodology</a>.</i></p>
   </div>
 
   <div
@@ -373,7 +374,7 @@
 
 <style>
   .storyblock {
-    background-color: var(--color-gray-600);
+    background-color: #475569; /* slate-600 */
     color: #f9fafb;
     padding: 12px 24px;
     width: 360px;

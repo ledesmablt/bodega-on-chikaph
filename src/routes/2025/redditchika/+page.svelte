@@ -20,20 +20,25 @@
   @import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
 
   :global {
+    body {
+      background-color: #f7f4ec; /* ripped from the internet */ /* alternative: #fefaf1; */
+    }
+
     article#redditchika_2025 {
       --font-serif: IBM Plex Serif;
-      /* --font-sans: IBM Plex Sans; */
       --font-sans: Reddit Sans;
       --font-mono: IBM Plex Mono;
-      --color-theme-dark-orange: #ff4500;
+      --color-theme-dark-orange: #ff4500; /* reddit orange */
+      --color-theme-mid-orange: #ff6830;
       --color-theme-light-orange: #fcdacc;
+      --color-text-body: #282828; /* gray-700 */ /* alternative: #282828; */
 
       width: 100%;
       max-width: 640px;
       margin: 0 auto;
       margin-bottom: 64px;
       font-family: Reddit Sans;
-      color: var(--color-gray-700);
+      color: var(--color-text-body);
 
       ::selection {
         background: #fcdacc;
@@ -41,7 +46,9 @@
 
       a {
         text-decoration: underline;
-        text-decoration-color: var(--color-theme-dark-orange);
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+        text-decoration-color: var(--color-theme-mid-orange);
       }
 
       .app-prose {
