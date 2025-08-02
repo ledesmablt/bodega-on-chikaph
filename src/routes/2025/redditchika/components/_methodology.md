@@ -7,7 +7,7 @@ an open-source database of Reddit posts and comments.
 The 180 posts were shortlisted from the 10 posts with the highest upvotes for every month from January 2024 to June 2025.
 I manually tagged the subject & sentiment per post by skimming its contents and comments, as well as additional googling where necessary.
 
-For the analysis, I used Jupyter Notebook (pandas & matplotlib) and good ol' Google Sheets / Excel **(TODO: OPEN SOURCE!!)**.
+For the analysis, I used Jupyter Notebook (pandas & matplotlib) and good ol' spreadsheets. The data is open for viewing on [Google Sheets](https://docs.google.com/spreadsheets/d/1YCpPq1cJOcVlOwFJCc80GHa0vuwAEkitCfcAZa0Mdrw/edit?usp=sharing).
 
 For the visualization, I used svelte and d3.
 
@@ -43,5 +43,3 @@ are not as high as when you check them on Reddit itself, or some posts have been
 whether existing data is updated is unclear, but from spot-checking a few old & recent posts and their upvotes,
 the dataset is close enough to realtime data (a few hundred to a thousand upvotes apart) to paint a close-enough
 picture of what's trending on the subreddit.
-
-**TODO further analysis for next time?**

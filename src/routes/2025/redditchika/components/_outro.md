@@ -1,4 +1,4 @@
-I didn't have high expectations, but I'm pleasantly surprised by how much I enjoyed browsing ChikaPH.
+I didn't know what to expect, but I was pleasantly surprised by how much I enjoyed browsing ChikaPH.
 
 My preconceptions of the subreddit were wrong; it's not all about shocking content.
 It seems like people give just as much — perhaps even more — attention to celebrating

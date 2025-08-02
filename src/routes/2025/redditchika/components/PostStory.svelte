@@ -103,6 +103,14 @@
 </script>
 
 <section id="posts-story" class="flex w-full max-w-screen flex-col items-center">
+  <p id="scroll-to-continue" class="text-center text-gray-500 font-mono text-sm mt-12 min-h-8">
+    {#if currentStep === null}
+      ↓ scroll to keep reading
+    {:else}
+      {''}
+    {/if}
+  </p>
+
   <div class="h-120"></div>
 
   <ChikaPosts
@@ -184,7 +192,7 @@
     data-selected-post-id="1f7hnov"
   >
     <p>
-      Politicians like <strong>Leni Robredo</strong> and <strong>Vico Sotto</strong> also have their
+      Politicians like <strong>Vico Sotto</strong> and <strong>Leni Robredo</strong> also have their
       share of screen time.
     </p>
   </div>
@@ -295,7 +303,7 @@
     data-selected-sentiments="negative"
     data-selected-post-id="1big0i4"
   >
-    <p>There are moments when the community rallies together and cries for justice...</p>
+    <p>On the other hand, there are moments when the community rallies together and cries for justice...</p>
   </div>
 
   <div
@@ -334,7 +342,6 @@
     <p>
       Of course, ChikaPH wouldn't be complete without the <i>chika</i> — especially around scandals.
     </p>
-    <p>TODO: footnote on why "shocking" is tagged as neutral</p>
     <p>TODO: filter for scandals</p>
   </div>
 
@@ -389,6 +396,8 @@
       <i>Use the filters below to interact with the dataset.</i>
     </p>
   </div>
+
+  <div class="with-spacer"></div>
 </section>
 
 <style>
@@ -402,9 +411,5 @@
     flex-direction: column;
     gap: 8px;
     line-height: 1.5;
-  }
-
-  .with-spacer {
-    margin-bottom: 80vh;
   }
 </style>

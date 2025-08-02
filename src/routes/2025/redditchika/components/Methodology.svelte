@@ -45,6 +45,5 @@
         list-style-position: inside;
       }
     }
-
   }
 </style>
