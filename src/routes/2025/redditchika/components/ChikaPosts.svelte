@@ -6,6 +6,7 @@
   import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
   import { fade, fly } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
+  import { COLORS, REACTIONS } from './utils'
 
   let {
     selectedPeople = $bindable<string[]>([]),
@@ -17,22 +18,12 @@
     showFilters = $bindable(false)
   } = $props()
 
-  const COLORS = {
-    black: 'black',
-    lightGray: '#e5e7eb',
-    lightOrange: '#fcdacc',
-    darkOrange: '#ff4500',
-    green: '#22c55e',
-    red: '#f87171',
-    gray: '#6b7280'
-  } as const
-
   // TODO: plug this into the tailwind theme
   const MIN_WIDTH = 390
   const MAX_WIDTH = 1200
   const MAX_HEIGHT = 680
   let mouse = $state([0, 0])
-  let containerWidth = $state(390)
+  let containerWidth = $state(MIN_WIDTH)
   let containerHeight = $derived(Math.min(containerWidth + 80, MAX_HEIGHT))
   const widthDomain = $derived([MIN_WIDTH, MAX_WIDTH])
   const minCircleScale = $derived(d3.scaleLinear(widthDomain, [3, 8]).clamp(true))
@@ -41,23 +32,25 @@
   const maxCircleR = $derived(maxCircleScale(containerWidth))
   const orangeGradient = d3.interpolateRgb(COLORS.lightOrange, COLORS.darkOrange)
 
-  const REACTIONS: Record<string, string> = {
-    respect: 'positive',
-    happy: 'positive',
-    funny: 'positive',
-    supportive: 'positive',
-    shocking: 'neutral',
-    interesting: 'neutral',
-    neutral: 'neutral',
-    mixed: 'neutral',
-    sad: 'negative',
-    annoying: 'negative',
-    angry: 'negative'
-  }
-
+  // TODO: does this need to a $state?
   let chikaPosts = $state<ChikaPost[]>([])
-  // TODO: limit this to top
-  const peopleOptions = $derived(new Set(chikaPosts.flatMap((post) => post.people ?? [])))
+  const getPeopleOptions = (): { subject: string; count: number }[] => {
+    const people = chikaPosts.flatMap((post) => (post.people as string[]) ?? [])
+    const asKeys = _.countBy(people)
+    return Object.entries(asKeys)
+      .map(([key, value]) => ({
+        subject: key,
+        count: value
+      }))
+      .sort((a, b) => {
+        const countDiff = b.count - a.count
+        if (countDiff !== 0) {
+          return countDiff
+        }
+        return a.subject.localeCompare(b.subject)
+      })
+  }
+  const peopleOptions = $derived(getPeopleOptions())
   const maxUps = 11507
 
   const RANK_THRESHOLD = 30
@@ -65,6 +58,7 @@
   const minUps = $derived(showOnlyTop ? 5000 : 1579)
   const radiusScale = $derived(d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR]))
 
+  // TODO: does this really need a $state?
   let simulation: d3.Simulation<any, any> | null = $state(null)
 
   const getFill = (d: ChikaPost): string => {
@@ -477,9 +471,10 @@
               }}
             >
               <option value="">(filter by subject)</option>
-              <!-- TODO: limit to top 20, show # of ups  -->
               {#each peopleOptions as option}
-                <option value={option}>{option}</option>
+                <option value={option.subject}
+                  >{option.subject} - {option.count} post{option.count > 1 ? 's' : ''}</option
+                >
               {/each}
             </select>
           </div>
