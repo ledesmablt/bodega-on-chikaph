@@ -515,7 +515,7 @@
     >
       <p class="line-clamp-1">{selectedPost.title}</p>
       {#if selectedPost.people.length > 0}
-        <p class="line-clamp-1">Subject: {selectedPost.people.join(', ')}</p>
+        <p class="line-clamp-1">Subject: {(selectedPost.people ?? []).join(', ')}</p>
       {/if}
       <p>Vibe: {selectedPost.reaction}</p>
       <p><i>(click for more details)</i></p>
@@ -528,28 +528,33 @@
         <button class="ml-auto cursor-pointer" onclick={onCloseDialog}>x</button>
       </div>
       <h3 class="text-2xl font-semibold">{openedPost.title}</h3>
-      <div class="font-mono">
-        <p class="text-sm text-gray-600">
-          Posted on: {new Date(openedPost.date).toLocaleDateString()}
+      <div id="post-details" class="font-mono text-sm">
+        <p>
+          {openedPost.ups.toLocaleString()} upvotes • {openedPost.num_comments.toLocaleString()} comments
         </p>
-        <p class="text-sm">{openedPost.ups.toLocaleString()} upvotes</p>
+        <p>
+          Posted on {new Date(openedPost.date).toLocaleDateString()}
+        </p>
+        <p>
+          <a
+            href={openedPost.permalink}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-sm hover:underline"
+          >
+            View on Reddit
+          </a>
+        </p>
       </div>
 
-      {#if openedPost.selftext}
-        <div id="post-selftext" class="flex flex-col gap-2 py-4 text-sm">
+      <div id="post-selftext" class="flex flex-col gap-2 py-4 text-sm">
+        {#if openedPost.selftext}
           {@html marked(openedPost.selftext)}
-        </div>
-      {/if}
-      <div class="mb-4 flex justify-center">
-        <a
-          href={openedPost.permalink}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-blue-500 hover:underline"
-        >
-          View post on Reddit
-        </a>
+        {:else}
+          <p class="mt-2 text-center text-gray-500"><i>(this post has no description)</i></p>
+        {/if}
       </div>
+      <div class="mb-4 flex justify-center"></div>
     {/if}
   </dialog>
 </div>
@@ -562,6 +567,13 @@
     width: 480px;
     padding: 16px 24px;
     border-radius: 6px;
+
+    div#post-details {
+      margin-top: 12px;
+      p {
+        margin-bottom: 2px;
+      }
+    }
 
     :global {
       div#post-selftext {
