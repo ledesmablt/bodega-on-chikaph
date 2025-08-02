@@ -13,11 +13,11 @@ export const REACTIONS: Record<string, string> = {
   happy: 'positive',
   funny: 'positive',
   supportive: 'positive',
-  shocking: 'neutral',
-  interesting: 'neutral',
+  shocked: 'neutral',
+  interested: 'neutral',
   neutral: 'neutral',
   mixed: 'neutral',
   sad: 'negative',
-  annoying: 'negative',
+  annoyed: 'negative',
   angry: 'negative'
 }

@@ -405,9 +405,15 @@
     observer = new ResizeObserver(handleResize)
     if (el) observer.observe(el)
 
-    d3.json('/data/2025/redditchika/chika_10.json')
+    d3.csv<any>('/data/2025/redditchika/chika_10.csv', d3.autoType)
       .then((data) => {
-        chikaPosts = data as ChikaPost[]
+        chikaPosts = data.map(record => {
+          return {
+            ...record,
+            people: (record.people ?? '').split(','),
+            tags: (record.tags ?? '').split(', '),
+          } as ChikaPost
+        })
         drawContainer()
         drawSimulation({ resetForce: true })
       })
@@ -514,11 +520,9 @@
       out:fade={{ duration: 150 }}
     >
       <p class="line-clamp-1">{selectedPost.title}</p>
-      {#if selectedPost.people.length > 0}
-        <p class="line-clamp-1">Subject: {(selectedPost.people ?? []).join(', ')}</p>
-      {/if}
-      <p>Vibe: {selectedPost.reaction}</p>
-      <p><i>(click for more details)</i></p>
+      <p class="line-clamp-1">Subject: {(selectedPost.people ?? []).join(', ') || 'none'}</p>
+      <p>Response: {selectedPost.reaction}</p>
+      <p class="mt-2"><i>(click for more details)</i></p>
     </button>
   {/if}
 
