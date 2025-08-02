@@ -584,6 +584,12 @@
     cursor: pointer;
   }
 
+  select {
+    -webkit-appearance: 'menulist';
+    -moz-appearance: 'menulist';
+    appearance: 'menulist';
+  }
+
   :global {
     svg#top-10-wrapper {
       .top-10-item {
