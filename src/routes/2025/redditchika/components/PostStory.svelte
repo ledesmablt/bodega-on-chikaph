@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
+  import * as d3 from 'd3'
   import scrollama from 'scrollama'
   import ChikaPosts from './ChikaPosts.svelte'
   import type { ColorMode, Sentiment } from './_types'
@@ -78,8 +79,26 @@
       })
   }
 
+  const setHeight = (newHeight: number) => {
+    const spacing = Math.round(newHeight * 0.8)
+    d3.selectAll('#posts-story div.with-spacer')
+      .style('margin-bottom', `${spacing}px`)
+  }
+
   onMount(() => {
     setupScrolly()
+    // use this instead of vh because vh is wonky and causes responsiveness issues
+    // on mobile. yes, this means resizing vertically won't be as nice, but what are
+    // the odds.
+    setHeight(window.innerHeight)
+
+    // const onResizeWindow = () => {
+    //   onResizeHeight(window.innerHeight)
+    // }
+    // window.addEventListener('resize', onResizeWindow)
+    // return () => {
+    //   window.removeEventListener('resize', onResizeWindow)
+    // }
   })
 </script>
 
