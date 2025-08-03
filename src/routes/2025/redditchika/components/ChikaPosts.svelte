@@ -451,7 +451,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
   id="top-10-wrapper"
-  class="sticky top-1/2 w-full transform-[translateY(-50%)] lg:min-w-[1024px]"
+  class="sticky w-full transform-[translateY(-40%)] md:transform-[translateY(-50%)] lg:min-w-[1024px]"
   bind:this={el}
   onclick={(e) => {
     const target = e.target as SVGElement | HTMLElement

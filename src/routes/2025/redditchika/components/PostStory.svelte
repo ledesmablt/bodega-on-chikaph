@@ -92,6 +92,11 @@
     const spacing = Math.round(newHeight * 0.8)
     d3.selectAll('#posts-story div.with-spacer')
       .style('margin-bottom', `${spacing}px`)
+
+    // set the sticky element's `top` here because doing something like `top: 50%` 
+    // causes wonky repositioning on mobile
+    d3.select('#posts-story #top-10-wrapper')
+      .style('top', `${Math.round(newHeight / 2)}px`)
   }
 
   onMount(() => {
