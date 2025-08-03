@@ -6,7 +6,7 @@
   import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
   import { fade, fly } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
-  import { COLORS, REACTIONS } from './utils'
+  import { COLORS, REACTIONS, TAGS } from './utils'
 
   let {
     selectedPeople = $bindable<string[]>([]),
@@ -43,6 +43,7 @@
         subject: key,
         count: value
       }))
+      .filter((obj) => !!obj.subject)
       .sort((a, b) => {
         const countDiff = b.count - a.count
         if (countDiff !== 0) {
@@ -136,7 +137,7 @@
     }
     console.log('drawContainer', width)
     const container = d3
-      .select('#top-10-wrapper')
+      .select('#top-10')
       .attr('width', width)
       .attr('height', containerHeight)
     return container
@@ -392,6 +393,15 @@
     drawSimulation()
   }
 
+  const onChangeSelectedTags = (value: string) => {
+    if (value) {
+      selectedTags = [value]
+    } else {
+      selectedTags = []
+    }
+    drawSimulation()
+  }
+
   // resizing mumbo jumbo that chatgpt gave me
   let el: any // reference to the element
   let width = 0
@@ -440,6 +450,7 @@
 
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
+  id="top-10-wrapper"
   class="sticky top-1/2 w-full transform-[translateY(-50%)] lg:min-w-[1024px]"
   bind:this={el}
   onclick={(e) => {
@@ -450,13 +461,13 @@
     }
   }}
 >
-  <svg id="top-10-wrapper" class="z-1"> </svg>
+  <svg id="top-10" class="z-1"> </svg>
 
-  <div class="mt-2 h-[96px]">
+  <div class="mt-2 h-[152px] flex flex-col items-center">
     {#if showFilters}
       <div
         id="active-filters"
-        class="mt-2 flex items-start justify-center gap-2"
+        class="mt-2 flex items-start justify-center gap-2 bg-white rounded border w-fit p-4"
         transition:fade={{ duration: 200 }}
       >
         <div class="flex flex-col gap-2">
@@ -471,7 +482,7 @@
               class="w-full rounded px-1"
             >
               <option value="ups">color by upvotes</option>
-              <option value="sentiment">color by sentiment</option>
+              <option value="sentiment">color by reaction</option>
             </select>
           </div>
           <div id="select-person-wrapper">
@@ -482,7 +493,6 @@
                 'w-full': true,
                 'px-1': true,
                 'text-gray-500': !selectedPeople.length,
-                [`bg-[#ff4500]`]: !!selectedPeople.length
               }}
               value={selectedPeople[0] ?? ''}
               onchange={(e) => {
@@ -491,9 +501,7 @@
             >
               <option value="">(filter by subject)</option>
               {#each peopleOptions as option}
-                <option value={option.subject}
-                  >{option.subject} - {option.count} post{option.count > 1 ? 's' : ''}</option
-                >
+                <option value={option.subject}>{option.subject}</option>
               {/each}
             </select>
           </div>
@@ -514,9 +522,29 @@
                 onChangeSelectedSentiments(e.currentTarget.value)
               }}
             >
-              <option value="">(filter by sentiment)</option>
+              <option value="">(filter by reaction)</option>
               {#each Object.entries(REACTIONS) as [key]}
                 <option value={key}>{key}</option>
+              {/each}
+            </select>
+          </div>
+          <div id="select-tag-wrapper">
+            <select
+              name="select-tag"
+              value={selectedTags[0] ?? ''}
+              class={{
+                'w-full': true,
+                rounded: true,
+                'px-1': true,
+                'text-gray-500': !selectedTags.length
+              }}
+              onchange={(e) => {
+                onChangeSelectedTags(e.currentTarget.value)
+              }}
+            >
+              <option value="">(filter by other tags)</option>
+              {#each TAGS as tag}
+                <option value={tag}>{tag}</option>
               {/each}
             </select>
           </div>
@@ -613,14 +641,15 @@
     cursor: pointer;
   }
 
-  select {
+  #active-filters select {
+    min-width: 320px;
     -webkit-appearance: 'menulist';
     -moz-appearance: 'menulist';
     appearance: 'menulist';
   }
 
   :global {
-    svg#top-10-wrapper {
+    svg#top-10 {
       .top-10-item {
         transition: fill 0.2s ease;
         cursor: pointer;

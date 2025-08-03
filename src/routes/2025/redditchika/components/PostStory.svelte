@@ -398,6 +398,7 @@
     data-selected-people=""
     data-selected-sentiments=""
     data-selected-post-id=""
+    data-selected-tags=""
     data-show-filters="true"
   >
     <p>

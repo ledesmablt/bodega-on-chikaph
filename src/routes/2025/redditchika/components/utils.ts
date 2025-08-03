@@ -21,3 +21,13 @@ export const REACTIONS: Record<string, string> = {
   annoyed: 'negative',
   angry: 'negative'
 }
+
+export const TAGS: string[] = [
+  'celebrity',
+  'influencer',
+  'politics',
+  'cheating',
+  'speculation',
+  'lovelife',
+  'other news'
+] as const
