@@ -170,7 +170,7 @@
     post.style('padding', '16px 24px')
 
     // if small screen, just center it
-    if (containerWidth <= 800) {
+    if (containerWidth <= 640) {
       post.style('top', `${containerHeight - 20}px`)
       post.style('left', `${containerWidth / 2 - boxWidth / 2}px`)
       return
@@ -451,7 +451,7 @@
 <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 <div
   id="top-10-wrapper"
-  class="sticky w-full transform-[translateY(-40%)] md:transform-[translateY(-50%)] lg:min-w-[1024px]"
+  class="sticky w-full transform-[translateY(-40%)] sm:transform-[translateY(-50%)] lg:min-w-[1024px]"
   bind:this={el}
   onclick={(e) => {
     const target = e.target as SVGElement | HTMLElement

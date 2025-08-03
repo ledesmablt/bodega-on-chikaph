@@ -1,7 +1,7 @@
 # Methodology
 
 ## Sources & analysis
-Reddit post data for r/ChikaPH was downloaded on July 9, 2025 from [Project Arctic Shift](https://github.com/ArthurHeitmann/arctic_shift),
+Post data for the subreddit r/ChikaPH was downloaded on July 9, 2025 from [Project Arctic Shift](https://github.com/ArthurHeitmann/arctic_shift),
 an open-source database of Reddit posts and comments.
 
 The 180 posts were shortlisted from the 10 posts with the highest upvotes for every month from January 2024 to June 2025.
@@ -23,7 +23,7 @@ It’s more nuanced when there are multiple potential subjects in the post. If o
 
 *Sentiment* is how the community is generally responding to the post content. This was manually tagged and based on reading the top comments (those with the most upvotes often end up on top).
 
-The post sentiment is grouped into three main categories - positive, negative, and neutral. These categories also have their own subcategories:
+The post sentiment is grouped into three main categories — positive, negative, and neutral. These categories also have their own subcategories:
 
 - positive - respect, happy, funny, supportive
 - negative - sad, annoyed, angry
@@ -38,8 +38,14 @@ From observing people reacting to scandals (both on Reddit and in real life), th
 Finally, posts whose responses felt lukewarm or nonchalant fell into either “interested” (e.g. *"alright, nice post"*) or just “neutral” (e.g. *"ok i get it, moving on with life"*).
 
 ## Caveats & other notes
-Post data does not reflect realtime stats — e.g. upvotes
-are not as high as when you check them on Reddit itself, or some posts have been deleted. The cadence of ingestion and
-whether existing data is updated is unclear, but from spot-checking a few old & recent posts and their upvotes,
+Post data in the analysis and the visualization does not reflect realtime data (e.g. upvotes
+are not as high as when you check them on Reddit itself, or some posts have been deleted). The cadence of ingestion and
+whether existing data is updated is unclear. From spot-checking a few old & recent posts and their upvotes,
 the dataset is close enough to realtime data (a few hundred to a thousand upvotes apart) to paint a close-enough
 picture of what's trending on the subreddit.
+
+This analysis does not account for the posts outside the top 10 per month.
+At the time of writing, the sub had at least 67,000 posts and 2.5 million comments in total.
+While there exist different methods to parse the text (e.g. clustering or using an LLM to extract metadata),
+some posts have little to no description but all the context in the images.
+For this analysis, I judged that the sample of top 10 posts per month was enough to see what trends last and change in the course of the subreddit.

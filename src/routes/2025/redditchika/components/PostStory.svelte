@@ -31,9 +31,7 @@
         const dataSelectedSentiment = element.attributes.getNamedItem(
           'data-selected-sentiments'
         )?.value
-        const dataSelectedTags = element.attributes.getNamedItem(
-          'data-selected-tags'
-        )?.value
+        const dataSelectedTags = element.attributes.getNamedItem('data-selected-tags')?.value
         const dataShowFilters = element.attributes.getNamedItem('data-show-filters')?.value
 
         if (currentStep === null) {
@@ -90,13 +88,11 @@
 
   const setHeight = (newHeight: number) => {
     const spacing = Math.round(newHeight * 0.8)
-    d3.selectAll('#posts-story div.with-spacer')
-      .style('margin-bottom', `${spacing}px`)
+    d3.selectAll('#posts-story div.with-spacer').style('margin-bottom', `${spacing}px`)
 
-    // set the sticky element's `top` here because doing something like `top: 50%` 
+    // set the sticky element's `top` here because doing something like `top: 50%`
     // causes wonky repositioning on mobile
-    d3.select('#posts-story #top-10-wrapper')
-      .style('top', `${Math.round(newHeight / 2)}px`)
+    d3.select('#posts-story #top-10-wrapper').style('top', `${Math.round(newHeight / 2)}px`)
   }
 
   onMount(() => {
@@ -117,7 +113,7 @@
 </script>
 
 <section id="posts-story" class="flex w-full max-w-screen flex-col items-center">
-  <p id="scroll-to-continue" class="text-center text-gray-500 font-mono text-sm mt-12 min-h-8">
+  <p id="scroll-to-continue" class="mt-12 min-h-8 text-center font-mono text-sm text-gray-500">
     {#if currentStep === null}
       ↓ scroll to keep reading
     {:else}
@@ -166,9 +162,9 @@
     data-show-top="30"
   >
     <p>
-      The <strong>Anthony & Maris</strong> issue last year also made huge waves—at the time it felt like
-      everyone was glued to their screens waiting for the next update, spilling new info and tea over
-      parties and dinner catchups.
+      The <strong>Anthony & Maris</strong> issue also made waves — at the time it felt like everyone
+      was glued to their screens waiting for the next update, spilling breaking news over parties and
+      dinner catchups.
     </p>
   </div>
 
@@ -179,12 +175,12 @@
     data-show-top="180"
   >
     <p>
-      Is there more to ChikaPH than celebrities and politics? Does the sub tend to talk about
-      certain people or topics over others?
+      Is there more to r/ChikaPH than celebrities and politics? Does the sub lean towards certain
+      people or topics?
     </p>
     <p>
-      Looking into the <strong>top 10 posts per month</strong>, we'll have more data to work with
-      and it might give us a better idea.
+      Looking into the <strong>top 10 posts per month</strong>, for a total of 180 posts, might give
+      us a better idea.
     </p>
   </div>
 
@@ -193,9 +189,10 @@
     data-selected-people="Christopher Diwata, Maris Racal, Anthony Jennings"
     data-selected-post-id=""
   >
-    <p>Who's talked about the most often?</p>
+    <p>How often are topics brought up?</p>
     <p>
-      <strong>Christopher Diwata</strong> and <strong>Anthony & Maris</strong> are mentioned a fair bit.
+      <strong>Christopher Diwata</strong> and <strong>Anthony & Maris</strong> appear in more posts beyond
+      the top 30.
     </p>
   </div>
 
@@ -217,7 +214,7 @@
   >
     <p>
       <strong>Kathryn Bernardo</strong>, though she doesn't make top headlines, is the most
-      mentioned and upvoted person in the sub's top 10 monthly posts.
+      mentioned person in the dataset.
     </p>
   </div>
 
@@ -228,8 +225,8 @@
     data-selected-post-id=""
   >
     <p>
-      While ChikaPH is mainly a gossip subreddit, people don’t just respond strongly to shock and
-      speculation. Let's look more into how people are reacting to posts...
+      While r/ChikaPH is mainly a gossip subreddit, people don’t only talk about shock and
+      speculation. Let's look more into what else users are saying...
     </p>
   </div>
 
@@ -250,7 +247,7 @@
     <p>
       <strong class="bg-gray-700 px-1">Gray</strong> circles are posts with
       <strong class="bg-gray-700 px-1">mixed or ambiguous</strong> reactions like feeling shocked or
-      simply interested.
+      simply expressing interest.
     </p>
   </div>
 
@@ -258,10 +255,11 @@
     class="story-step storyblock with-spacer"
     data-color-mode="sentiment"
     data-selected-sentiments="positive"
+    data-selected-post-id=""
   >
     <p>
-      To my surprise, most of the top posts on this gossip subreddit have positive reactions in the
-      comments sections and the posts themselves.
+      To my surprise, most of the top posts on this gossip subreddit have positive responses in the
+      comments and the posts themselves.
     </p>
   </div>
 
@@ -271,7 +269,7 @@
     data-selected-sentiments="positive"
     data-selected-post-id="1jrc5ft"
   >
-    <p>Everyone loves a good glow-up...</p>
+    <p>The community loves a celebrity fashion photoshoot...</p>
   </div>
 
   <div
@@ -280,7 +278,7 @@
     data-selected-sentiments="positive"
     data-selected-post-id="1l7vcq3"
   >
-    <p>... and reddit is all ears for courtroom drama.</p>
+    <p>... and loves chiming in to courtroom drama.</p>
   </div>
 
   <div
@@ -289,10 +287,7 @@
     data-selected-sentiments="positive"
     data-selected-post-id="1k6pq5g"
   >
-    <p>
-      To my surprise, not all headlines in ChikaPH are about celebrities and politics — even Pope
-      Francis made headlines around the time of his passing.
-    </p>
+    <p>To my surprise, not all headlines in r/ChikaPH are about celebrities and politics.</p>
   </div>
 
   <div
@@ -302,7 +297,7 @@
     data-selected-post-id="1jwtvqy"
   >
     <p>
-      It's also nice to see the community expressing respect and support for people powering through
+      And it's nice to see the community expressing respect and support for people going through
       difficult circumstances.
     </p>
   </div>
@@ -313,7 +308,10 @@
     data-selected-sentiments="negative"
     data-selected-post-id="1big0i4"
   >
-    <p>On the other hand, there are moments when the community rallies together and cries for justice...</p>
+    <p>
+      On the other hand, there are moments when the community rallies together and cries for
+      justice...
+    </p>
   </div>
 
   <div
@@ -348,11 +346,11 @@
     class="story-step storyblock with-spacer"
     data-color-mode="sentiment"
     data-selected-sentiments="neutral"
-    data-selected-post-id="1kxo4dd"
+    data-selected-post-id="1h8g952"
     data-selected-tags="cheating"
   >
     <p>
-      Of course, ChikaPH wouldn't be complete without the <i>chika</i> — especially around scandals.
+      Of course, r/ChikaPH wouldn't be complete without the <i>chika</i> — especially around scandals.
     </p>
   </div>
 
@@ -360,20 +358,20 @@
     class="story-step storyblock with-spacer"
     data-color-mode="sentiment"
     data-selected-sentiments="neutral"
-    data-selected-post-id="194h84i"
-    data-selected-tags="cheating,speculation"
+    data-selected-post-id="193a39s"
+    data-selected-tags="cheating"
   >
-    <p>The sub enjoys speculating on if a big breakup is about to happen (complete with receipts & evidence)...</p>
+    <p>Many enjoy speculating about an impending breakup...</p>
   </div>
 
   <div
     class="story-step storyblock with-spacer"
     data-color-mode="sentiment"
-    data-selected-sentiments="neutral"
-    data-selected-post-id="1clbysh"
+    data-selected-sentiments="positive"
+    data-selected-post-id="1bu2vby"
     data-selected-tags="speculation,lovelife"
   >
-    <p>... or if love is in the air.</p>
+    <p>... while some might believe that love is in the air.</p>
   </div>
 
   <div
@@ -386,8 +384,8 @@
     data-selected-tags=""
   >
     <p>
-      It's also amusing to see posts with more complex discussions, like this 4000-word essay on
-      BINI (which also has my <a
+      Drama aside, it's also amusing to see posts with more nuanced discussions, like this 4000-word
+      essay on BINI (which also has my <a
         rel="noreferrer"
         target="_blank"
         class="underline"
