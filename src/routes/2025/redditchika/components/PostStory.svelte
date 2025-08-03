@@ -8,6 +8,7 @@
   let currentStep = $state<number | null>(null)
   let selectedPeople = $state<string[]>([])
   let selectedSentiments = $state<Sentiment[]>([])
+  let selectedTags = $state<string[]>([])
   let selectedPostId = $state<string | null>(null)
   let showTopRank = $state(0)
   let colorMode = $state<ColorMode>('ups')
@@ -29,6 +30,9 @@
         const dataSelectedPostId = element.attributes.getNamedItem('data-selected-post-id')?.value
         const dataSelectedSentiment = element.attributes.getNamedItem(
           'data-selected-sentiments'
+        )?.value
+        const dataSelectedTags = element.attributes.getNamedItem(
+          'data-selected-tags'
         )?.value
         const dataShowFilters = element.attributes.getNamedItem('data-show-filters')?.value
 
@@ -59,6 +63,11 @@
 
         if (typeof dataSelectedPostId === 'string') {
           selectedPostId = dataSelectedPostId
+          shouldRedraw = true
+        }
+
+        if (typeof dataSelectedTags === 'string') {
+          selectedTags = dataSelectedTags.split(',').filter(Boolean)
           shouldRedraw = true
         }
 
@@ -120,11 +129,11 @@
     bind:selectedPostId
     bind:selectedSentiments
     bind:showFilters
+    bind:selectedTags
     bind:this={instance}
   />
 
   <div class="story-step storyblock with-spacer" data-selected-people="" data-show-top="30">
-    <!-- TODO: move this to a more discreet message? -->
     <p>
       <i>
         Posts with more upvotes appear as larger and darker circles, while posts with fewer upvotes
@@ -145,7 +154,6 @@
     </p>
   </div>
 
-  <!-- TODO: animate showing more & more circles? -->
   <div
     class="story-step storyblock with-spacer"
     data-selected-people="Maris Racal, Anthony Jennings"
@@ -206,7 +214,6 @@
       <strong>Kathryn Bernardo</strong>, though she doesn't make top headlines, is the most
       mentioned and upvoted person in the sub's top 10 monthly posts.
     </p>
-    <p>note: could make this a little quiz?</p>
   </div>
 
   <div
@@ -240,7 +247,6 @@
       <strong class="bg-gray-700 px-1">mixed or ambiguous</strong> reactions like feeling shocked or
       simply interested.
     </p>
-    <p class="mt-2 text-sm"><i>For more details, see <a href="#methodology">methodology</a>.</i></p>
   </div>
 
   <div
@@ -261,7 +267,6 @@
     data-selected-post-id="1jrc5ft"
   >
     <p>Everyone loves a good glow-up...</p>
-    <p>TODO: filter for glowup related posts?</p>
   </div>
 
   <div
@@ -329,6 +334,7 @@
     data-color-mode="sentiment"
     data-selected-sentiments="negative"
     data-selected-post-id="1dbkego"
+    data-selected-tags=""
   >
     <p>... or even just hates on the same influencers.</p>
   </div>
@@ -338,11 +344,11 @@
     data-color-mode="sentiment"
     data-selected-sentiments="neutral"
     data-selected-post-id="1kxo4dd"
+    data-selected-tags="cheating"
   >
     <p>
       Of course, ChikaPH wouldn't be complete without the <i>chika</i> — especially around scandals.
     </p>
-    <p>TODO: filter for scandals</p>
   </div>
 
   <div
@@ -350,8 +356,9 @@
     data-color-mode="sentiment"
     data-selected-sentiments="neutral"
     data-selected-post-id="194h84i"
+    data-selected-tags="cheating,speculation"
   >
-    <p>The sub also loves speculating on if a breakup is about to happen...</p>
+    <p>The sub enjoys speculating on if a big breakup is about to happen (complete with receipts & evidence)...</p>
   </div>
 
   <div
@@ -359,9 +366,9 @@
     data-color-mode="sentiment"
     data-selected-sentiments="neutral"
     data-selected-post-id="1clbysh"
+    data-selected-tags="speculation,lovelife"
   >
-    <p>... or if a new loveteam might be coming around.</p>
-    <p>TODO: filter for speculation</p>
+    <p>... or if love is in the air.</p>
   </div>
 
   <div
@@ -371,9 +378,10 @@
     data-selected-sentiments="neutral"
     data-selected-post-id="1l4yu8s"
     data-show-filters="false"
+    data-selected-tags=""
   >
     <p>
-      It was also amusing to see posts with more complex discussions, like this 4000-word essay on
+      It's also amusing to see posts with more complex discussions, like this 4000-word essay on
       BINI (which also has my <a
         rel="noreferrer"
         target="_blank"

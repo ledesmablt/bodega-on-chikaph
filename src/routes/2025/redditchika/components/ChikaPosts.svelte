@@ -13,6 +13,7 @@
     showTopRank = $bindable(1),
     colorMode = $bindable<ColorMode>('ups'),
     selectedSentiments = $bindable<Sentiment[]>([]),
+    selectedTags = $bindable<string[]>([]),
     hoveredPostId = $bindable<string | null>(null),
     selectedPostId = $bindable<string | null>(),
     showFilters = $bindable(false)
@@ -65,21 +66,30 @@
     const defaultColor = COLORS.black
     const ratio = (d.ups - minUps) / (maxUps - minUps)
 
-    const hasPeopleOverlap = _.intersection(d.people, selectedPeople).length == 0
-    if (selectedPeople.length > 0 && hasPeopleOverlap) {
+    const hasPeopleOverlap = _.intersection(d.people, selectedPeople).length > 0
+    if (selectedPeople.length > 0 && !hasPeopleOverlap) {
       // color only selected people, otherwise gray the rest out
       return COLORS.lightGray
     }
 
+    const sentiment = REACTIONS[d.reaction ?? '']
+    const matchesReaction = selectedSentiments.includes(d.reaction)
+    const matchesSentiment = selectedSentiments.includes(sentiment)
+    if (selectedSentiments.length && !(matchesReaction || matchesSentiment)) {
+      return COLORS.lightGray
+    }
+
+    // this one behaves a bit differently - we want to check that the post
+    // has ALL the selected tags.
+    const hasTagOverlap = _.intersection(d.tags, selectedTags).length == selectedTags.length
+    if (selectedTags.length && !hasTagOverlap) {
+      return COLORS.lightGray
+    }
+
+    // actually render the selected colors
     if (colorMode === 'ups') {
       return orangeGradient(ratio)
     } else if (colorMode === 'sentiment') {
-      const sentiment = REACTIONS[d.reaction ?? '']
-      const matchesReaction = selectedSentiments.includes(d.reaction)
-      const matchesSentiment = selectedSentiments.includes(sentiment)
-      if (selectedSentiments.length && !(matchesReaction || matchesSentiment)) {
-        return COLORS.lightGray
-      }
       switch (sentiment) {
         case 'positive':
           return COLORS.green
@@ -118,6 +128,8 @@
   let openedPostId: string | null = $state(null)
   let openedPost = $derived(nodesById[openedPostId ?? ''])
 
+  $inspect(selectedPost)
+
   export const drawContainer = ({ width }: { width?: number } = {}) => {
     if (!width) {
       width = containerWidth
@@ -134,24 +146,24 @@
       .attr('id', 'top-10-group')
   }
 
-  const drawPostPreview = () => {
-    const post = d3.select('#post-preview')
+  const positionPostPreview = () => {
     if (!selectedPostId) {
       return
     }
 
     // TODO: on desktop, preview on hovered post instead of selected
-    const node = nodesById[selectedPostId]
+    const node = d3.select(`circle.top-10-item[data-post-id="${selectedPostId}"]`)
     if (!node) {
       return
     }
+    const radius = Number(node.attr('r'))
+    const x = Number(node.attr('cx'))
+    const y = Number(node.attr('cy'))
 
-    // TODO: improve positioning
-    // TODO: is there a way to do this with `.data` & `.join` so we get a smooth `node.radius` transition
-    // TODO: hovering over the preview box itself "resizes" the circle, which is pretty annoying...
+    // TODO: make this smaller on mobile
     const boxWidth = 320
     const boxHeight = 132
-    // TODO: make this smaller on mobile
+    const post = d3.select('#post-preview')
     post.style('width', `${boxWidth}px`)
     post.style('height', `${boxHeight}px`)
     post.style('padding', '16px 24px')
@@ -163,20 +175,12 @@
       return
     }
 
-    // default left aligned
-    const padding = 12
-    post.style('top', `${node.y + node.radius + padding}px`)
-    const withinRightBound = node.x + boxWidth <= containerWidth
-    if (withinRightBound) {
-      post.style('left', `${node.x}px`)
+    post.style('top', `${y + radius + 12}px`)
+    const beforeCenter = x <= containerWidth / 2
+    if (beforeCenter) {
+      post.style('left', `${x - 5}px`)
     } else {
-      // right align
-      const withinLeftBound = node.x >= boxWidth
-      if (withinLeftBound) {
-        post.style('left', `${node.x - boxWidth}px`)
-      } else {
-        post.style('left', '0px')
-      }
+      post.style('right', `${containerWidth - x - 5}px`)
     }
   }
 
@@ -193,7 +197,10 @@
       .data(nodes, (d) => (d as ChikaPost).id)
       .join(
         (enter) => {
-          const circle = enter.append('circle').attr('r', 0)
+          const circle = enter
+            .append('circle')
+            .attr('r', 0)
+            .attr('fill', (d) => getFill(d))
 
           const getDuration = (d: SimulationNode) => {
             if (d.overall_rank === 1) {
@@ -225,6 +232,12 @@
         },
         (update) => {
           update
+            .attr('fill', (d) => getFill(d))
+            .transition()
+            .duration(120)
+            .ease(d3.easeCubic)
+
+          update
             .attr('r', (d) => d.radius)
             .transition()
             .duration(100)
@@ -233,7 +246,7 @@
         (exit) => exit
       )
       .classed('top-10-item', true)
-      .attr('fill', (d) => getFill(d))
+      .attr('data-post-id', (d) => d.id)
 
     const onSimulationTick = () => {
       circles
@@ -247,7 +260,7 @@
             onOpenDialog(d)
           } else {
             selectedPostId = d.id
-            drawPostPreview()
+            positionPostPreview()
           }
         })
         .on('mouseenter', function (_event, d) {
@@ -276,7 +289,7 @@
         })
 
       // draw this on every tick so that the preview shifts with the node's position
-      drawPostPreview()
+      positionPostPreview()
     }
 
     const onReheatSimulation = (opts: DrawSimulationOptions) => {
@@ -328,7 +341,7 @@
       .alpha(getAlpha())
       .on('tick', onSimulationTick)
       .on('end', () => {
-        drawPostPreview()
+        positionPostPreview()
       })
 
     simulation.force('followMouse', (alpha) => {
@@ -407,11 +420,11 @@
 
     d3.csv<any>('/data/2025/redditchika/chika_10.csv', d3.autoType)
       .then((data) => {
-        chikaPosts = data.map(record => {
+        chikaPosts = data.map((record) => {
           return {
             ...record,
             people: (record.people ?? '').split(','),
-            tags: (record.tags ?? '').split(', '),
+            tags: (record.tags ?? '').split(', ')
           } as ChikaPost
         })
         drawContainer()
