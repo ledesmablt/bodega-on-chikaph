@@ -4,7 +4,23 @@
   import Outro from './components/Outro.svelte'
   import Methodology from './components/Methodology.svelte'
   import Logo from '$lib/assets/Logo.svelte'
+
+  const ogDescription = "A glimpse into the Filipino pop culture psyche through one of the most popular internet communities."
 </script>
+
+<svelte:head>
+  <title>
+    on r/ChikaPH: a glimpse into the Filipino pop culture psyche through
+    one of the most popular internet communities
+  </title>
+  <meta property="og:url" content="https://bodega.zip/2025/redditchika"  />
+  <meta property="og:site_name" content="Bodega"  />
+  <meta property="title" content="on r/ChikaPH"  />
+  <meta property="og:title" content="on r/ChikaPH"  />
+  <meta property="description" content={ogDescription} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:image" content="/assets/2025/redditchika/thumb.png" />
+</svelte:head>
 
 {#if typeof window !== 'undefined'}
   <nav class="flex flex-col items-center w-full mt-6 mb-8">
