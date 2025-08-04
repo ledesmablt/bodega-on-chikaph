@@ -7,9 +7,9 @@ an open-source database of Reddit posts and comments.
 The 180 posts were shortlisted from the 10 posts with the highest upvotes for every month from January 2024 to June 2025.
 I manually tagged the subject & sentiment per post by skimming its contents and comments, as well as additional googling where necessary.
 
-For the analysis, I used Jupyter Notebook (pandas & matplotlib) and good ol' spreadsheets. The data is open for viewing on [Google Sheets](https://docs.google.com/spreadsheets/d/1YCpPq1cJOcVlOwFJCc80GHa0vuwAEkitCfcAZa0Mdrw/edit?usp=sharing).
+For the analysis, I used [Jupyter Notebook](https://jupyter.org/) (pandas & matplotlib) and good ol' spreadsheets. The data is open for viewing on [Google Sheets](https://docs.google.com/spreadsheets/d/1YCpPq1cJOcVlOwFJCc80GHa0vuwAEkitCfcAZa0Mdrw/edit?usp=sharing).
 
-For the visualization, I used svelte and d3.
+For the visualization, I used [svelte](https://svelte.dev/) and [d3](https://d3js.org/).
 
 ## Tagging subjects
 

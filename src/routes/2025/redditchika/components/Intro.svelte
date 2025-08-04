@@ -9,7 +9,7 @@
       a glimpse into the Filipino pop culture psyche through one of the most popular internet
       communities
     </p>
-    <p class="mt-2">by Benj Ledesma</p>
+    <p class="mt-2">words & visuals by Benj Ledesma</p>
   </div>
 </div>
 

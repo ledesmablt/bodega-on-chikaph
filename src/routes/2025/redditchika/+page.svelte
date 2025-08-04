@@ -4,8 +4,17 @@
   import Outro from './components/Outro.svelte'
   import Methodology from './components/Methodology.svelte'
   import Logo from '$lib/assets/Logo.svelte'
+  import { onMount } from 'svelte'
 
   const ogDescription = "A glimpse into the Filipino pop culture psyche through one of the most popular internet communities."
+
+  onMount(() => {
+    document.body.style.backgroundColor = '#f7f4ec'
+
+    return () => {
+      document.body.style.backgroundColor = 'white'
+    }
+  })
 </script>
 
 <svelte:head>
@@ -51,10 +60,6 @@
       --color-theme-mid-orange: #ff6830;
       --color-theme-light-orange: #fcdacc;
       --color-text-body: #282828; /* gray-700 */ /* alternative: #282828; */
-    }
-
-    body {
-      background-color: #f7f4ec; /* ripped from the internet */ /* alternative: #fefaf1; */
     }
 
     nav #bodega-nav-logo {
