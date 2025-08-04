@@ -3,9 +3,16 @@
   import PostStory from './components/PostStory.svelte'
   import Outro from './components/Outro.svelte'
   import Methodology from './components/Methodology.svelte'
+  import Logo from '$lib/assets/Logo.svelte'
 </script>
 
 {#if typeof window !== 'undefined'}
+  <nav class="flex flex-col items-center w-full mt-6 mb-8">
+    <a href="/">
+      <Logo id="bodega-nav-logo" height="24" />
+    </a>
+  </nav>
+
   <article id="redditchika_2025">
     <Intro />
     <PostStory />
@@ -20,11 +27,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,200..900;1,200..900&display=swap');
 
   :global {
-    body {
-      background-color: #f7f4ec; /* ripped from the internet */ /* alternative: #fefaf1; */
-    }
-
-    article#redditchika_2025 {
+    :root {
       --font-serif: IBM Plex Serif;
       --font-sans: Reddit Sans;
       --font-mono: IBM Plex Mono;
@@ -32,7 +35,22 @@
       --color-theme-mid-orange: #ff6830;
       --color-theme-light-orange: #fcdacc;
       --color-text-body: #282828; /* gray-700 */ /* alternative: #282828; */
+    }
 
+    body {
+      background-color: #f7f4ec; /* ripped from the internet */ /* alternative: #fefaf1; */
+    }
+
+    nav #bodega-nav-logo {
+      fill: #111827;
+
+      &:hover {
+        fill: var(--color-theme-dark-orange);
+        transition: 0.6s ease;
+      }
+    }
+
+    article#redditchika_2025 {
       width: 100%;
       max-width: 640px;
       margin: 0 auto;
