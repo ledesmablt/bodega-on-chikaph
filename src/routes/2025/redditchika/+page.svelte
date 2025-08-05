@@ -45,6 +45,12 @@
     <div class="text-center my-20">~~~</div>
     <Methodology/>
   </article>
+
+  <footer class="bg-black py-4">
+    <a href="/" class="flex justify-center">
+      <Logo id="bodega-nav-logo" height="24" fill="white" class="pl-2" />
+    </a>
+  </footer>
 {/if}
 
 <style>
