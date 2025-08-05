@@ -639,6 +639,7 @@
     position: fixed;
     text-align: left;
     cursor: pointer;
+    z-index: 10;
   }
 
   #active-filters select {
