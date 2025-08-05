@@ -32,13 +32,12 @@
        </li>
        <li>
          that's it! still cooking up a few more things 🍚🥘🍗
-         you <a href="https://pudding.cool/" target="blank" rel="noreferrer">might</a>
+         but in the meantime, you <a href="https://pudding.cool/" target="blank" rel="noreferrer">might</a>
          <a href="https://kontinentalist.com/" target="blank" rel="noreferrer">enjoy</a>
-         <a href="https://www.reddit.com/r/dataisbeautiful/" target="blank" rel="noreferrer">these</a>
-         in the meantime.
+         <a href="https://www.reddit.com/r/dataisbeautiful/" target="blank" rel="noreferrer">these</a> too.
        </li>
      </ol>
-     <p class="mt-8">📍 PH</p>
+     <p class="mt-6 text-sm">📍 PH</p>
    </section>
  </div> 
 
