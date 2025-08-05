@@ -23,6 +23,10 @@
         offset: 0.7
       })
       .onStepEnter(({ element, index }) => {
+        if (currentStep === index) {
+          // do nothing if no changes - buggy animation otherwise
+          return
+        }
         currentStep = index
         const dataShowTop = Number(element.attributes.getNamedItem('data-show-top')?.value)
         const dataPeople = element.attributes.getNamedItem('data-selected-people')?.value
@@ -287,7 +291,7 @@
     data-selected-sentiments="positive"
     data-selected-post-id="1k6pq5g"
   >
-    <p>To my surprise, not all headlines in r/ChikaPH are about celebrities and politics.</p>
+    <p>And to my surprise, not all headlines in r/ChikaPH are about celebrities and politics.</p>
   </div>
 
   <div
