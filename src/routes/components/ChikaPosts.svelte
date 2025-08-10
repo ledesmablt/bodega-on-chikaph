@@ -7,7 +7,9 @@
   import { fade, fly } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
   import { COLORS, REACTIONS, TAGS } from './utils'
+  import { base as BASE_PATH } from '$app/paths'
 
+  // NOTE: next time, just use a shared state instead of whatever this grew into.
   let {
     selectedPeople = $bindable<string[]>([]),
     showTopRank = $bindable(1),
@@ -19,7 +21,6 @@
     showFilters = $bindable(false)
   } = $props()
 
-  // TODO: plug this into the tailwind theme
   const MIN_WIDTH = 390
   const MAX_WIDTH = 1200
   const MAX_HEIGHT = 680
@@ -33,7 +34,6 @@
   const maxCircleR = $derived(maxCircleScale(containerWidth))
   const orangeGradient = d3.interpolateRgb(COLORS.lightOrange, COLORS.darkOrange)
 
-  // TODO: does this need to a $state?
   let chikaPosts = $state<ChikaPost[]>([])
   const getPeopleOptions = (): { subject: string; count: number }[] => {
     const people = chikaPosts.flatMap((post) => (post.people as string[]) ?? [])
@@ -60,7 +60,15 @@
   const minUps = $derived(showOnlyTop ? 5000 : 1579)
   const radiusScale = $derived(d3.scaleLinear([minUps, maxUps], [minCircleR, maxCircleR]))
 
-  // TODO: does this really need a $state?
+  // NOTE: these non-reactive variables, especially those used by the d3 visualization here,
+  // don't have to be declared as $state variables. d3 does its own DOM manipulation outside of
+  // svelte's component rendering lifecycle.
+  // instead of trying to reassign the `chikaPosts` and `nodes` variables, it might have been a
+  // better idea to just load all posts (but mark some as "hidden" where appropriate), and when
+  // there are changes in the filters or selected posts just call `drawContainer`. this shouldn't
+  // make svelte "tick" but will cause d3 to update the DOM.
+  // *CONCLUSION*: moving forward, prefer plain `let var = value` declarations if user interactions
+  // affect DOM nodes rendered d3 and not in the svelte template.
   let simulation: d3.Simulation<any, any> | null = $state(null)
 
   const getFill = (d: ChikaPost): string => {
@@ -108,7 +116,6 @@
 
   const getNodes = (): SimulationNode[] => {
     const simNodes = simulation?.nodes()
-    console.log(simNodes?.length, showTopRank)
     if (simNodes?.length !== showTopRank) {
       return chikaPosts
         .filter((node) => node.overall_rank <= showTopRank)
@@ -116,7 +123,7 @@
           ...node,
           radius: radiusScale(node.ups)
         }))
-        .sort((b, a) => b.overall_rank - a.overall_rank)
+        .sort((b, a) => b.overall_rank - a.overall_rank) as SimulationNode[]
     }
 
     // default to using the simulation nodes, which already have position & vector
@@ -135,11 +142,7 @@
     if (!width) {
       width = containerWidth
     }
-    console.log('drawContainer', width)
-    const container = d3
-      .select('#top-10')
-      .attr('width', width)
-      .attr('height', containerHeight)
+    const container = d3.select('#top-10').attr('width', width).attr('height', containerHeight)
     return container
       .append('g')
       .attr('width', width)
@@ -152,7 +155,6 @@
       return
     }
 
-    // TODO: on desktop, preview on hovered post instead of selected
     const node = d3.select(`circle.top-10-item[data-post-id="${selectedPostId}"]`)
     if (!node) {
       return
@@ -161,7 +163,6 @@
     const x = Number(node.attr('cx'))
     const y = Number(node.attr('cy'))
 
-    // TODO: make this smaller on mobile
     const boxWidth = 320
     const boxHeight = 132
     const post = d3.select('#post-preview')
@@ -189,7 +190,6 @@
     resetForce?: boolean
   }
   export const drawSimulation = (opts: DrawSimulationOptions = {}) => {
-    console.info('drawSimulation', opts)
     const g = d3.select('g#top-10-group')
 
     // draw the circles
@@ -253,8 +253,8 @@
       circles
         .classed('with-stroke', (d) => selectedPostId === d.id)
         // force simulation sets these values
-        .attr('cx', (d) => d.x)
-        .attr('cy', (d) => d.y)
+        .attr('cx', (d) => d.x ?? 0)
+        .attr('cy', (d) => d.y ?? 0)
         .on('click', (_event, d) => {
           const alreadySelected = selectedPostId === d.id
           if (alreadySelected) {
@@ -351,8 +351,15 @@
         return
       }
 
-      hoveredNode.vx += (mouse[0] - hoveredNode.x) * 0.15 * alpha
-      hoveredNode.vy += (mouse[1] - hoveredNode.y) * 0.15 * alpha
+      if (!hoveredNode.vx) {
+        hoveredNode.vx = 0
+      }
+      if (!hoveredNode.vy) {
+        hoveredNode.vy = 0
+      }
+
+      hoveredNode.vx += (mouse[0] - (hoveredNode.x ?? 0)) * 0.15 * alpha
+      hoveredNode.vy += (mouse[1] - (hoveredNode.y ?? 0)) * 0.15 * alpha
     })
 
     if (opts.resetForce) {
@@ -402,7 +409,8 @@
     drawSimulation()
   }
 
-  // resizing mumbo jumbo that chatgpt gave me
+  // NOTE: resizing mumbo jumbo that chatgpt gave me.
+  // next time, use runed? https://runed.dev/docs
   let el: any // reference to the element
   let width = 0
   let observer: any
@@ -424,11 +432,11 @@
   }
 
   onMount(() => {
-    // part of the resizing mumbo jumbo
+    // part of the resizing mumbo jumbo - i think there
     observer = new ResizeObserver(handleResize)
     if (el) observer.observe(el)
 
-    d3.csv<any>('/2025/redditchika/data/chika_10.csv', d3.autoType)
+    d3.csv<any>(`${BASE_PATH}/data/chika_10.csv`, d3.autoType)
       .then((data) => {
         chikaPosts = data.map((record) => {
           return {
@@ -463,11 +471,11 @@
 >
   <svg id="top-10" class="z-1"> </svg>
 
-  <div class="mt-2 h-[152px] flex flex-col items-center">
+  <div class="mt-2 flex h-[152px] flex-col items-center">
     {#if showFilters}
       <div
         id="active-filters"
-        class="mt-2 flex items-start justify-center gap-2 bg-white rounded border w-fit p-4"
+        class="mt-2 flex w-fit items-start justify-center gap-2 rounded border bg-white p-4"
         transition:fade={{ duration: 200 }}
       >
         <div class="flex flex-col gap-2">
@@ -492,7 +500,7 @@
                 rounded: true,
                 'w-full': true,
                 'px-1': true,
-                'text-gray-500': !selectedPeople.length,
+                'text-gray-500': !selectedPeople.length
               }}
               value={selectedPeople[0] ?? ''}
               onchange={(e) => {

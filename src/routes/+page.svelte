@@ -4,6 +4,7 @@
   import Outro from './components/Outro.svelte'
   import Methodology from './components/Methodology.svelte'
   import Logo from '$lib/assets/Logo.svelte'
+  import { base as BASE_PATH } from '$app/paths'
 
   const ogDescription = "A glimpse into the Filipino pop culture psyche through one of the most popular internet communities."
 </script>
@@ -13,8 +14,8 @@
     on r/ChikaPH: a glimpse into the Filipino pop culture psyche through
     one of the most popular internet communities
   </title>
-  <meta property="og:url" content="https://bodega.zip/2025/redditchika"  />
-  <meta property="og:image" content="/2025/redditchika/assets/thumb.png" />
+  <meta property="og:url" content="https://bodega.zip{BASE_PATH}"  />
+  <meta property="og:image" content="{BASE_PATH}/thumb.png" />
   <meta property="og:site_name" content="Bodega"  />
   <meta property="title" content="on r/ChikaPH"  />
   <meta property="og:title" content="on r/ChikaPH"  />

@@ -8,7 +8,8 @@ const config = {
   kit: {
     adapter: adapter(),
     paths: {
-      base: '/2025/redditchika'
+      base: '/2025/redditchika',
+      relative: true
     }
   },
   extensions: ['.svelte', '.svx', '.md']
