@@ -428,7 +428,7 @@
     observer = new ResizeObserver(handleResize)
     if (el) observer.observe(el)
 
-    d3.csv<any>('/data/2025/redditchika/chika_10.csv', d3.autoType)
+    d3.csv<any>('/data/chika_10.csv', d3.autoType)
       .then((data) => {
         chikaPosts = data.map((record) => {
           return {
