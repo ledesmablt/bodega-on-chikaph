@@ -6,7 +6,14 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "bodega-on-chikaph",
 	"compatibility_date": "2025-05-15",
-	"pages_build_output_dir": ".svelte-kit/cloudflare",
+  "main": "./.cloudflare/worker.js",
+  "site": {
+		"bucket": "./.cloudflare/public"
+	},
+  "route": {
+    "pattern": "bodega.zip/2025/redditchika*",
+    "zone_name": "bodega.zip"
+  },
 	"observability": {
 		"enabled": true
 	}

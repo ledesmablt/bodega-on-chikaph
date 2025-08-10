@@ -23,12 +23,12 @@
     one of the most popular internet communities
   </title>
   <meta property="og:url" content="https://bodega.zip/2025/redditchika"  />
+  <meta property="og:image" content="/2025/redditchika/assets/thumb.png" />
   <meta property="og:site_name" content="Bodega"  />
   <meta property="title" content="on r/ChikaPH"  />
   <meta property="og:title" content="on r/ChikaPH"  />
   <meta property="description" content={ogDescription} />
   <meta property="og:description" content={ogDescription} />
-  <meta property="og:image" content="/assets/thumb.png" />
 </svelte:head>
 
 {#if typeof window !== 'undefined'}
