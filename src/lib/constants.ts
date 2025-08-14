@@ -20,7 +20,7 @@ export const REACTIONS: Record<string, string> = {
   sad: 'negative',
   annoyed: 'negative',
   angry: 'negative'
-}
+} as const
 
 export const TAGS: string[] = [
   'celebrity',

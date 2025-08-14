@@ -3,10 +3,10 @@
   import { marked } from 'marked'
   import * as d3 from 'd3'
   import _ from 'lodash'
-  import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from './_types'
+  import type { ColorMode, ChikaPost, SimulationNode, Sentiment } from '$lib/types'
   import { fade, fly } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
-  import { COLORS, REACTIONS, TAGS } from './utils'
+  import { COLORS, REACTIONS, TAGS } from '$lib/constants'
   import { base as BASE_PATH } from '$app/paths'
 
   // NOTE: next time, just use a shared state instead of whatever this grew into.

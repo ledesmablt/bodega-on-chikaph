@@ -1,9 +1,9 @@
 <script lang="ts">
-  import Intro from './components/Intro.svelte'
-  import PostStory from './components/PostStory.svelte'
-  import Outro from './components/Outro.svelte'
-  import Methodology from './components/Methodology.svelte'
-  import Logo from '$lib/assets/Logo.svelte'
+  import Intro from './sections/Intro.svelte'
+  import PostStory from './sections/PostStory.svelte'
+  import Outro from './sections/Outro.svelte'
+  import Methodology from './sections/Methodology.svelte'
+  import Logo from '$lib/Logo.svelte'
   import { base as BASE_PATH } from '$app/paths'
 
   const ogDescription = "A glimpse into the Filipino pop culture psyche through one of the most popular internet communities."

@@ -2,8 +2,8 @@
   import { onMount } from 'svelte'
   import * as d3 from 'd3'
   import scrollama from 'scrollama'
-  import ChikaPosts from './ChikaPosts.svelte'
-  import type { ColorMode, Sentiment } from './_types'
+  import ChikaPosts from '$lib/ChikaPosts.svelte'
+  import type { ColorMode, Sentiment } from '$lib/types'
 
   let currentStep = $state<number | null>(null)
   let selectedPeople = $state<string[]>([])
